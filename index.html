@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noor Quotes</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#0f1115;
+  --card:#171a21;
+  --text:#e6e6e6;
+  --accent:#6ee7ff;
+}
+
+body.light {
+  --bg:#f7f8fa;
+  --card:#ffffff;
+  --text:#1f2937;
+  --accent:#2563eb;
+}
+
+body {
+  margin:0;
+  font-family:Inter;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition:0.3s;
+  background-size:cover;
+  background-position:center;
+}
+
+/* overlay for readability */
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.3);
+  z-index:-1;
+}
+
+.container {
+  text-align:center;
+  max-width:700px;
+  padding:20px;
+}
+
+.card {
+  background:var(--card);
+  padding:40px;
+  border-radius:16px;
+  transition:0.3s;
+}
+
+.verse {
+  font-size:20px;
+  line-height:1.7;
+  min-height:120px;
+  opacity:0;
+  transition:0.4s;
+}
+
+button {
+  margin-top:15px;
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  background:var(--accent);
+  color:#000;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* TOP RIGHT */
+.top {
+  position:fixed;
+  top:15px;
+  right:15px;
+  display:flex;
+  gap:10px;
+}
+
+.settings {
+  position:relative;
+}
+
+.panel {
+  display:none;
+  position:absolute;
+  right:0;
+  top:40px;
+  background:var(--card);
+  padding:12px;
+  border-radius:10px;
+  width:180px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">
+  <button onclick="toggleTheme()">🌙/☀️</button>
+
+  <div class="settings">
+    <button onclick="toggleSettings()">⚙️</button>
+
+    <div id="panel" class="panel">
+      <p style="margin:0 0 8px;">Wallpaper</p>
+      <input type="file" accept="image/*" onchange="setWallpaper(event)">
+      <button onclick="removeWallpaper()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div id="verse" class="verse"></div>
+    <button onclick="showVerse()">A Verse, please</button>
+  </div>
+</div>
+
+<script>
+const verses = [
+"The strongest person is the one who controls his anger. — Bukhari",
+"Speak good or remain silent. — Bukhari",
+"Make things easy, not difficult. — Bukhari",
+"Richness is contentment. — Bukhari",
+"Allah looks at your hearts and deeds. — Muslim",
+"Smiling at your brother is charity. — Tirmidhi",
+"The most beloved actions are those done consistently. — Bukhari",
+"Show mercy to those on earth. — Tirmidhi",
+"The world is a prison for the believer. — Muslim",
+
+"Patience is beautiful. — Qur’an 12:18",
+"Allah is with the patient.",
+"Allah is the best of planners. — Qur’an 8:30",
+"With hardship comes ease. — Qur’an 94:6",
+"Trust Allah’s timing.",
+"Allah never burdens a soul beyond what it can bear. — Qur’an 2:286",
+"Your heart finds peace in the remembrance of Allah.",
+"Dunya is temporary; Akhirah is forever.",
+"Every struggle brings you closer to Allah.",
+"Allah is enough for the one who relies on Him."
+];
+
+function showVerse() {
+  const box = document.getElementById("verse");
+  const random = verses[Math.floor(Math.random() * verses.length)];
+  box.style.opacity = 0;
+
+  setTimeout(() => {
+    box.innerText = random;
+    box.style.opacity = 1;
+  }, 300);
+}
+
+/* THEME */
+function toggleTheme() {
+  document.body.classList.toggle("light");
+}
+
+/* SETTINGS */
+function toggleSettings() {
+  const p = document.getElementById("panel");
+  p.style.display = p.style.display === "block" ? "none" : "block";
+}
+
+/* WALLPAPER */
+function setWallpaper(e) {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+    document.body.style.backgroundImage = `url(${event.target.result})`;
+    localStorage.setItem("wallpaper", event.target.result);
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function removeWallpaper() {
+  document.body.style.backgroundImage = "none";
+  localStorage.removeItem("wallpaper");
+}
+
+/* LOAD SAVED WALLPAPER */
+window.onload = function() {
+  const saved = localStorage.getItem("wallpaper");
+
+  if (saved) {
+    document.body.style.backgroundImage = `url(${saved})`;
+  }
+
+  showVerse();
+};
+</script>
+
+</body>
+</html>
