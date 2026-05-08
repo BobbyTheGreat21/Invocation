@@ -80,7 +80,7 @@ button:hover {
   background:var(--card);
   padding:12px;
   border-radius:10px;
-  width:180px;
+  width:240px;
 }
 
 /* MOOD SCREEN */
@@ -103,12 +103,6 @@ button:hover {
   width:100%;
 }
 
-.mood-card h1 {
-  margin-top:0;
-  margin-bottom:25px;
-  font-size:30px;
-}
-
 .moods {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
@@ -120,7 +114,7 @@ button:hover {
   font-size:15px;
 }
 
-/* VERSE SCREEN */
+/* VERSE */
 
 .container {
   text-align:center;
@@ -150,6 +144,26 @@ button:hover {
 .back-btn {
   margin-bottom:20px;
 }
+
+.fav-btn {
+  margin-left:10px;
+  background:gold;
+}
+
+/* SETTINGS UI */
+
+.setting-title {
+  margin:10px 0 6px;
+  font-size:13px;
+  opacity:0.8;
+}
+
+.small-btn {
+  width:100%;
+  margin-bottom:6px;
+  padding:8px;
+  font-size:12px;
+}
 </style>
 </head>
 
@@ -165,11 +179,27 @@ button:hover {
 
     <div id="panel" class="panel">
 
-      <p style="margin:0 0 8px;">Wallpaper</p>
+      <!-- VERSE STYLE -->
+      <div class="setting-title">Verse Style</div>
 
-      <input type="file" accept="image/*" onchange="setWallpaper(event)">
-      <br><br>
-      <button onclick="removeWallpaper()">Remove</button>
+      <button class="small-btn" onclick="setStyle('all')">All</button>
+      <button class="small-btn" onclick="setStyle('calm')">Calm</button>
+      <button class="small-btn" onclick="setStyle('motivational')">Motivational</button>
+      <button class="small-btn" onclick="setStyle('deep')">Deep</button>
+      <button class="small-btn" onclick="setStyle('short')">Short</button>
+
+      <!-- BACKGROUNDS -->
+      <div class="setting-title">Background</div>
+
+      <button class="small-btn" onclick="setBg('none')">Default</button>
+      <button class="small-btn" onclick="setBg('night')">Night Sky</button>
+      <button class="small-btn" onclick="setBg('ocean')">Ocean</button>
+      <button class="small-btn" onclick="setBg('gradient')">Gradient</button>
+
+      <!-- FAVORITES -->
+      <div class="setting-title">Favourites</div>
+
+      <button class="small-btn" onclick="viewFavourites()">View ⭐</button>
 
     </div>
 
@@ -215,6 +245,7 @@ button:hover {
     <div id="verse" class="verse"></div>
 
     <button class="verse-btn" onclick="showVerse()">A Verse, please</button>
+    <button class="fav-btn" onclick="saveFavourite()">⭐</button>
 
   </div>
 
@@ -223,88 +254,58 @@ button:hover {
 <script>
 
 /* =========================
-   1. MOOD-BASED VERSES
-   ========================= */
+   DATA (MOODS + STYLES)
+========================= */
 
 const moodVerses = {
 
-  Anxious: [
-    "Do not lose heart, Allah is with you.",
-    "Verily in the remembrance of Allah do hearts find rest."
-  ],
+  Anxious: {
+    calm: ["Breathe. Allah is near."],
+    motivational: ["Do not lose hope."],
+    deep: ["Your heart is not alone."],
+    short: ["Trust Him."]
+  },
 
-  Depressed: [
-    "With hardship comes ease. — Qur’an 94:6",
-    "Allah does not burden a soul beyond what it can bear."
-  ],
+  Depressed: {
+    calm: ["With hardship comes ease."],
+    motivational: ["Keep going."],
+    deep: ["Allah sees what you feel."],
+    short: ["It will pass."]
+  },
 
-  Apathetic: [
-    "Even small deeds matter in the sight of Allah.",
-    "Consistency is beloved even if small."
-  ],
+  Fearful: {
+    calm: ["Allah is with you."],
+    motivational: ["Face it with faith."],
+    deep: ["Nothing happens without His will."],
+    short: ["Fear not."]
+  },
 
-  Irritable: [
-    "The strong one is not who overpowers others, but who controls himself.",
-    "Hold back anger and you will find peace."
-  ],
-
-  Hopeless: [
-    "Never despair of the mercy of Allah.",
-    "Allah is the best of planners."
-  ],
-
-  Melancholy: [
-    "Allah is close to those who call upon Him.",
-    "In every sorrow there is hidden mercy."
-  ],
-
-  Overwhelmed: [
-    "Allah never burdens a soul beyond what it can bear.",
-    "Take it one step at a time."
-  ],
-
-  Resentful: [
-    "Forgiveness is closer to piety.",
-    "Let go, and Allah will replace it with peace."
-  ],
-
-  Lonely: [
-    "Allah is nearer than your jugular vein.",
-    "You are never truly alone."
-  ],
-
-  Guilty: [
-    "Allah is Most Forgiving, Most Merciful.",
-    "Turn back to Him and you will be forgiven."
-  ],
-
-  Fearful: [
-    "Fear not, indeed Allah is with you.",
-    "What is written for you will reach you."
-  ],
-
-  Restless: [
-    "Truly in the remembrance of Allah do hearts find peace.",
-    "Slow down, trust His timing."
-  ]
+  Restless: {
+    calm: ["Remember Allah, hearts find peace."],
+    motivational: ["Slow down."],
+    deep: ["Rest is also worship."],
+    short: ["Pause."]
+  }
 
 };
 
 /* =========================
-   2. STATE
-   ========================= */
+   STATE
+========================= */
 
 let currentMood = "";
+let currentStyle = "all";
 let currentList = [];
 
 /* =========================
-   3. START MOOD
-   ========================= */
+   START
+========================= */
 
 function startVerses(mood) {
 
   currentMood = mood;
-  currentList = moodVerses[mood] || [];
+
+  loadVerses();
 
   document.getElementById("moodScreen").style.display = "none";
   document.getElementById("verseScreen").style.display = "block";
@@ -313,8 +314,51 @@ function startVerses(mood) {
 }
 
 /* =========================
-   4. BACK
-   ========================= */
+   LOAD VERSES BASED ON STYLE
+========================= */
+
+function loadVerses() {
+
+  const data = moodVerses[currentMood];
+
+  if (!data) {
+    currentList = ["No verses found"];
+    return;
+  }
+
+  if (currentStyle === "all") {
+
+    currentList = Object.values(data).flat();
+
+  } else {
+
+    currentList = data[currentStyle] || [];
+  }
+}
+
+/* =========================
+   VERSE
+========================= */
+
+function showVerse() {
+
+  const box = document.getElementById("verse");
+
+  if (!currentList.length) return;
+
+  const v = currentList[Math.floor(Math.random() * currentList.length)];
+
+  box.style.opacity = 0;
+
+  setTimeout(() => {
+    box.innerText = v;
+    box.style.opacity = 1;
+  }, 200);
+}
+
+/* =========================
+   BACK
+========================= */
 
 function goBack() {
 
@@ -323,33 +367,87 @@ function goBack() {
 }
 
 /* =========================
-   5. SHOW VERSE
-   ========================= */
+   STYLE FILTER
+========================= */
 
-function showVerse() {
+function setStyle(style) {
 
-  const box = document.getElementById("verse");
+  currentStyle = style;
 
-  if (currentList.length === 0) {
-    box.innerText = "No verses found for this mood.";
-    box.style.opacity = 1;
-    return;
+  if (currentMood) {
+    loadVerses();
+    showVerse();
   }
-
-  const random =
-    currentList[Math.floor(Math.random() * currentList.length)];
-
-  box.style.opacity = 0;
-
-  setTimeout(() => {
-    box.innerText = random;
-    box.style.opacity = 1;
-  }, 300);
 }
 
 /* =========================
-   6. THEME
-   ========================= */
+   BACKGROUNDS
+========================= */
+
+function setBg(type) {
+
+  if (type === "none") {
+    document.body.style.backgroundImage = "none";
+  }
+
+  if (type === "night") {
+    document.body.style.backgroundImage =
+      "url('https://images.unsplash.com/photo-1506744038136-46273834b3fb')";
+  }
+
+  if (type === "ocean") {
+    document.body.style.backgroundImage =
+      "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')";
+  }
+
+  if (type === "gradient") {
+    document.body.style.backgroundImage =
+      "linear-gradient(120deg,#0f1115,#1f2937)";
+  }
+}
+
+/* =========================
+   FAVORITES
+========================= */
+
+function saveFavourite() {
+
+  const verse =
+    document.getElementById("verse").innerText;
+
+  let favs =
+    JSON.parse(localStorage.getItem("favs")) || [];
+
+  favs.push(verse);
+
+  localStorage.setItem("favs", JSON.stringify(favs));
+
+  alert("Saved ⭐");
+}
+
+function viewFavourites() {
+
+  let favs =
+    JSON.parse(localStorage.getItem("favs")) || [];
+
+  alert(favs.join("\n\n") || "No favourites yet.");
+}
+
+/* =========================
+   SETTINGS
+========================= */
+
+function toggleSettings() {
+
+  const p = document.getElementById("panel");
+
+  p.style.display =
+    p.style.display === "block" ? "none" : "block";
+}
+
+/* =========================
+   THEME
+========================= */
 
 function toggleTheme() {
 
@@ -362,66 +460,6 @@ function toggleTheme() {
       ? "☀️"
       : "🌙";
 }
-
-/* =========================
-   7. SETTINGS
-   ========================= */
-
-function toggleSettings() {
-
-  const p = document.getElementById("panel");
-
-  p.style.display =
-    p.style.display === "block"
-      ? "none"
-      : "block";
-}
-
-/* =========================
-   8. WALLPAPER
-   ========================= */
-
-function setWallpaper(e) {
-
-  const file = e.target.files[0];
-  const reader = new FileReader();
-
-  reader.onload = function(event) {
-
-    document.body.style.backgroundImage =
-      `url(${event.target.result})`;
-
-    localStorage.setItem("wallpaper", event.target.result);
-  };
-
-  reader.readAsDataURL(file);
-}
-
-function removeWallpaper() {
-
-  document.body.style.backgroundImage = "none";
-  localStorage.removeItem("wallpaper");
-}
-
-/* =========================
-   9. LOAD
-   ========================= */
-
-window.onload = function() {
-
-  const saved = localStorage.getItem("wallpaper");
-
-  if (saved) {
-    document.body.style.backgroundImage = `url(${saved})`;
-  }
-
-  const btn = document.getElementById("themeBtn");
-
-  btn.innerText =
-    document.body.classList.contains("light")
-      ? "☀️"
-      : "🌙";
-};
 
 </script>
 
