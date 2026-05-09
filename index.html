@@ -42,14 +42,13 @@
         .moods button { padding:14px; border-radius:14px; color: var(--text); background: rgba(110, 231, 255, 0.1); border: 1px solid var(--accent); }
         .moods button:hover { background: var(--accent); color: #000; }
 
-        .verse { font-size:18px; line-height:1.7; min-height:120px; opacity:0; transform:translateY(8px); transition:0.4s ease; margin: 20px 0; }
+        .verse { font-size:18px; line-height:1.7; min-height:120px; opacity:0; transform:translateY(8px); transition:0.4s ease; margin: 20px 0; white-space: pre-line; }
         .verse.show { opacity:1; transform:translateY(0); }
 
         .verse-btn { padding:12px 20px; width: 100%; margin-top: 10px; }
         .back-btn { background: transparent; color: var(--accent); margin-bottom: 15px; font-size: 14px; }
         .fav-btn { margin-top: 10px; background:transparent; border: 1px solid gold; color: gold; padding: 8px; width: 100%; }
         
-        .setting-title { margin:10px 0 6px; font-size:12px; opacity:0.7; text-align: left; }
         .small-btn { width:100%; margin-bottom:6px; padding:9px; border-radius:10px; }
 
         @keyframes fadeIn { from {opacity:0; transform:translateY(8px);} to {opacity:1; transform:translateY(0);} }
@@ -62,13 +61,11 @@
     <div style="position:relative;">
         <button onclick="toggleSettings()" style="padding: 10px;">⚙️</button>
         <div id="panel" class="panel">
-            <div class="setting-title">Favourites</div>
             <button class="small-btn" onclick="viewFavourites()">View Saved ⭐</button>
         </div>
     </div>
 </div>
 
-<!-- MOOD SCREEN -->
 <div id="moodScreen" class="screen">
     <div class="mood-card">
         <h1>How are you feeling?</h1>
@@ -85,7 +82,6 @@
     </div>
 </div>
 
-<!-- VERSE SCREEN -->
 <div id="verseScreen" class="screen hidden">
     <div class="card">
         <button class="back-btn" onclick="goBack()">← Back to Moods</button>
@@ -98,43 +94,46 @@
 <script>
 const moodVerses = {
     Anxious: [
-        "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ\n(O Allah, I seek refuge in You from anxiety and sorrow.)",
-        "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ\n(Allah is sufficient for us, and He is the best disposer of affairs.)",
-        "لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\n(There is no deity except You; glory be to You. Indeed, I was among the wrongdoers.)"
+        "اللهم إني أعوذ بك من الهم والحزن\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.",
+        "حسبي الله لا إله إلا هو عليه توكلت وهو رب العرش العظيم\nḤasbiyallāhu lā ilāha illā Huwa, ‘alayhi tawakkaltu wa Huwa Rabbul-‘Arshil-‘Aẓīm\nAllah is sufficient for me; I rely on Him, Lord of the Mighty Throne.",
+        "اللهم رحمتك أرجو فلا تكلني إلى نفسي طرفة عين\nAllāhumma raḥmataka arjū fa-lā takilnī ilā nafsī ṭarfata ‘ayn\nO Allah, I hope for Your mercy, do not leave me to myself even for a moment.",
+        "يا حي يا قيوم برحمتك أستغيث أصلح لي شأني كله\nYā Ḥayyū yā Qayyūm, bi-raḥmatika astaghīth, aṣliḥ lī sha’nī kullah\nO Ever-Living, O Sustainer, I seek Your mercy—set right all my affairs.",
+        "اللهم لا سهل إلا ما جعلته سهلاً\nAllāhumma lā sahla illā mā ja‘altahu sahlā\nO Allah, nothing is easy except what You make easy.",
+        "اللهم إني أعوذ بك من الجبن والبخل\nAllāhumma innī a‘ūdhu bika minal-jubni wal-bukhl\nO Allah, I seek refuge in You from fear and miserliness.",
+        "اللهم ثبت قلبي على دينك\nAllāhumma thabbit qalbī ‘alā dīnik\nO Allah, keep my heart firm upon Your faith.",
+        "رب إني مسني الضر وأنت أرحم الراحمين\nRabbi innī massaniyaḍ-ḍurru wa anta arḥamur-rāḥimīn\nMy Lord, harm has touched me, and You are the Most Merciful.",
+        "لا إله إلا أنت سبحانك إني كنت من الظالمين\nLā ilāha illā anta subḥānaka innī kuntu minaẓ-ẓālimīn\nThere is no god but You, glory be to You; I was among the wrongdoers.",
+        "اللهم اكفني بحلالك عن حرامك وأغنني بفضلك عمن سواك\nAllāhumma ikfinī bi-ḥalālika ‘an ḥarāmik wa aghninī bi-faḍlika ‘amman siwāk\nO Allah, suffice me with what You made lawful over what is unlawful, and enrich me by Your grace over all others."
     ],
     Depressed: [
-        "إِنَّ مَعَ الْعُسْرِ يُسْرًا\n(Indeed, with hardship comes ease.)",
-        "اللَّهُمَّ رَحْمَتَكَ أَرْجُو\n(O Allah, I hope for Your mercy.)",
-        "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\n(Verily, in the remembrance of Allah do hearts find rest.)"
+        "إِنَّ مَعَ الْعُسْرِ يُسْرًا\nIndeed, with hardship comes ease.",
+        "اللَّهُمَّ رَحْمَتَكَ أَرْجُو\nO Allah, I hope for Your mercy.",
+        "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\nVerily, in the remembrance of Allah do hearts find rest."
     ],
     Lonely: [
-        "اللَّهُمَّ آنِسْ وَحْشَتِي\n(O Allah, comfort my loneliness.)",
-        "اللَّهُمَّ لَا تَذَرْنِي فَرْدًا وَأَنْتَ خَيْرُ الْوَارِثِينَ\n(O Allah, do not leave me alone, and You are the best of inheritors.)",
-        "إِنَّمَا أَشْكُو بَثِّي وَحُزْنِي إِلَى اللَّهِ\n(I only complain of my sorrow and grief to Allah.)"
+        "اللَّهُمَّ آنِسْ وَحْشَتِي\nO Allah, comfort my loneliness.",
+        "اللَّهُمَّ لَا تَذَرْنِي فَرْدًا\nO Allah, do not leave me alone.",
+        "إِنَّمَا أَشْكُو بَثِّي وَحُزْنِي إِلَى اللَّهِ\nI only complain of my sorrow and grief to Allah."
     ],
     Overwhelmed: [
-        "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا\n(Allah does not burden a soul beyond what it can bear.)",
-        "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي\n(My Lord, expand for me my chest and make my task easy for me.)",
-        "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ\n(O Ever-Living, O Sustainer, I seek help through Your mercy.)"
+        "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا\nAllah does not burden a soul beyond what it can bear.",
+        "رَبِّ اشْرَحْ لِي صَدْرِي\nMy Lord, expand for me my chest.",
+        "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَستَغِيُث\nO Ever-Living, O Sustainer, I seek help through Your mercy."
     ],
     Guilty: [
-        "لَا تَقْنَطُوا مِنْ رَحْمَةِ اللَّهِ\n(Do not despair of the mercy of Allah.)",
-        "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي\n(O Allah, You are Most Forgiving and love forgiveness, so forgive me.)",
-        "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ\n(My Lord, forgive me and accept my repentance.)"
+        "لَا تَقْنَطُوا مِنْ رَحْمَةِ اللَّهِ\nDo not despair of the mercy of Allah.",
+        "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي\nO Allah, You are Forgiving and love forgiveness, so forgive me."
     ],
     Betrayed: [
-        "فَصَبْرٌ جَمِيلٌ وَاللَّهُ الْمُسْتَعَانُ\n(So patience is most fitting, and Allah is the one sought for help.)",
-        "وَأُفَوِّضُ أَمْرِي إِلَى اللَّهِ\n(I entrust my affair to Allah.)",
-        "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ\n(Indeed, Allah is with the patient.)"
+        "فَصَبْرٌ جَمِيلٌ\nSo patience is most fitting.",
+        "وَأُفَوِّضُ أَمْرِي إِلَى اللَّهِ\nI entrust my affair to Allah."
     ],
     Fearful: [
-        "لَا تَخَفْ إِنَّ اللَّهَ مَعَنَا\n(Do not fear, indeed Allah is with us.)",
-        "أَلَيْسَ اللَّهَ بِكَافٍ عَبْدَهُ\n(Is Allah not sufficient for His servant?)",
-        "إِنِّي تَوَكَّلْتُ عَلَى اللَّهِ\n(Indeed, I place my trust in Allah.)"
+        "لَا تَخَفْ إِنَّ اللَّهَ مَعَنَا\nDo not fear, indeed Allah is with us.",
+        "أَلَيْسَ اللَّهُ بِكَافٍ عَبْدَهُ\nIs Allah not sufficient for His servant?"
     ],
     Restless: [
-        "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\n(Verily, in the remembrance of Allah do hearts find rest.)",
-        "اللَّهُمَّ أَلْهِمْنِي السَّكِينَةَ\n(O Allah, inspire in me peace and tranquility.)"
+        "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\nVerily, in the remembrance of Allah do hearts find rest."
     ]
 };
 
