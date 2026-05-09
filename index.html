@@ -34,7 +34,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- IMPROVED HEADER --- */
+        /* --- HEADER --- */
         header {
             position: fixed; top: 0; left: 0; right: 0;
             padding: 25px 30px;
@@ -45,7 +45,7 @@
         .brand-link {
             font-size: 12px; letter-spacing: 5px;
             text-transform: uppercase; font-weight: 600;
-            opacity: 0.8; /* Increased visibility */
+            opacity: 0.8;
             cursor: pointer;
         }
 
@@ -66,7 +66,7 @@
         }
         .hidden { opacity: 0 !important; pointer-events: none; transform: translateY(15px); }
 
-        /* --- FOCUSED CAROUSEL --- */
+        /* --- CAROUSEL --- */
         .mood-container {
             width: 100%; overflow-x: auto; display: flex;
             scroll-snap-type: x mandatory; padding: 40px 0;
@@ -120,6 +120,9 @@
         }
 
         #welcomeScreen { z-index: 3000; background: var(--bg); text-align: center; cursor: pointer; }
+        
+        /* Utility for scrolling list */
+        #favList { padding-bottom: 50px; }
     </style>
 </head>
 <body class="deepsea">
@@ -182,8 +185,10 @@
     </div>
 </div>
 
-<!-- Favourites -->
+<!-- Favourites (Fixed with Back Button) -->
 <div id="favScreen" class="screen hidden" style="justify-content:flex-start; overflow-y:auto; padding-top:100px;">
+    <button style="background:none; border:none; color:var(--accent); margin-bottom:20px; letter-spacing:2px; font-size:11px; cursor:pointer;" onclick="showScreen('moodScreen')">← BACK TO HOME</button>
+    
     <h2 style="font-weight:300; letter-spacing:3px; text-transform:uppercase; font-size:16px; margin-bottom:20px;">Saved Du'as</h2>
     <div id="favList" style="width:100%; max-width:500px;"></div>
 </div>
@@ -240,13 +245,12 @@
 
     function shareAsImage() {
         const container = document.getElementById('share-container');
-        // Temporarily style for high-quality export
         const originalBg = container.style.background;
         container.style.background = getComputedStyle(document.body).backgroundImage;
         
         html2canvas(container, {
             backgroundColor: null,
-            scale: 2, // Higher quality
+            scale: 2,
             logging: false
         }).then(canvas => {
             const link = document.createElement('a');
@@ -285,6 +289,8 @@
     }
 
     function viewFavourites() {
+        const favScreen = document.getElementById('favScreen');
+        favScreen.scrollTop = 0; // Reset scroll to top
         const list = document.getElementById('favList');
         const favs = JSON.parse(localStorage.getItem('inv-favs')) || [];
         list.innerHTML = favs.length ? "" : "<p style='opacity:0.4; text-align:center; margin-top:40px;'>No saved du'as yet.</p>";
