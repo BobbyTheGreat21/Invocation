@@ -1,2 +1,2 @@
 #Najwa
-Daily Islamic verses for reflection and peace
+Whispered du’as for every state of the heart
