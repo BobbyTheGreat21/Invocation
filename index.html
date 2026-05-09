@@ -31,35 +31,47 @@ body {
   display:flex;
   justify-content:center;
   align-items:center;
-  transition:0.3s;
-  background-size:cover;
-  background-position:center;
   overflow:hidden;
+  transition:0.4s ease;
 }
 
+/* soft dark overlay */
 body::before {
   content:"";
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,0.35);
   z-index:-1;
 }
 
+/* ===== GLOBAL BUTTONS ===== */
 button {
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   background:var(--accent);
   color:#000;
   font-weight:600;
   cursor:pointer;
+  transition:0.25s ease;
 }
 
+button:hover {
+  transform:translateY(-2px);
+  opacity:0.9;
+}
+
+button:active {
+  transform:scale(0.97);
+}
+
+/* ===== TOP BAR ===== */
 .top {
   position:fixed;
   top:15px;
   right:15px;
   display:flex;
   gap:10px;
+  z-index:20;
 }
 
 .settings {
@@ -70,51 +82,69 @@ button {
   display:none;
   position:absolute;
   right:0;
-  top:40px;
+  top:45px;
   background:var(--card);
-  padding:12px;
-  border-radius:10px;
+  padding:14px;
+  border-radius:14px;
   width:240px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.25);
+  animation:fadeIn 0.25s ease;
 }
 
-.mood-screen {
+/* ===== SCREEN ANIMATIONS ===== */
+.screen {
   position:absolute;
   inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
   padding:20px;
+  animation:fadeInScale 0.5s ease;
 }
 
+.hidden {
+  display:none !important;
+}
+
+/* ===== MOOD CARD ===== */
 .mood-card {
   background:var(--card);
-  padding:40px;
-  border-radius:18px;
+  padding:42px;
+  border-radius:22px;
   text-align:center;
-  max-width:700px;
+  max-width:720px;
   width:100%;
+  box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  animation:floatIn 0.6s ease;
 }
 
 .moods {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
   gap:12px;
+  margin-top:20px;
 }
 
 .moods button {
   padding:14px;
+  border-radius:14px;
+  transition:0.25s ease;
 }
 
+/* ===== VERSE CARD ===== */
 .container {
   text-align:center;
-  max-width:700px;
+  max-width:720px;
   padding:20px;
 }
 
 .card {
   background:var(--card);
-  padding:40px;
-  border-radius:16px;
+  padding:42px;
+  border-radius:22px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  animation:floatIn 0.6s ease;
+  transition:0.4s ease;
 }
 
 .verse {
@@ -122,12 +152,19 @@ button {
   line-height:1.7;
   min-height:120px;
   opacity:0;
-  transition:0.4s;
+  transform:translateY(8px);
+  transition:0.4s ease;
 }
 
+.verse.show {
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ===== BUTTONS ===== */
 .verse-btn {
-  margin-top:15px;
-  padding:10px 14px;
+  margin-top:18px;
+  padding:12px 16px;
 }
 
 .back-btn {
@@ -139,17 +176,37 @@ button {
   background:gold;
 }
 
+/* ===== TEXT ===== */
 .setting-title {
   margin:10px 0 6px;
-  font-size:13px;
-  opacity:0.8;
+  font-size:12px;
+  opacity:0.7;
+  letter-spacing:0.5px;
 }
 
 .small-btn {
   width:100%;
   margin-bottom:6px;
-  padding:8px;
+  padding:9px;
+  border-radius:10px;
 }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(8px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+@keyframes fadeInScale {
+  from {opacity:0; transform:scale(0.98);}
+  to {opacity:1; transform:scale(1);}
+}
+
+@keyframes floatIn {
+  from {opacity:0; transform:translateY(15px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
 </style>
 </head>
 
@@ -180,7 +237,9 @@ button {
 </div>
 </div>
 
-<div id="moodScreen" class="mood-screen">
+<!-- MOOD -->
+<div id="moodScreen" class="screen">
+
 <div class="mood-card">
 
 <h1>How are you feeling?</h1>
@@ -195,7 +254,10 @@ button {
 </div>
 </div>
 
-<div class="container" id="verseScreen" style="display:none;">
+<!-- VERSE -->
+<div id="verseScreen" class="screen hidden">
+
+<div class="container">
 <div class="card">
 
 <button class="back-btn" onclick="goBack()">← Back</button>
@@ -207,31 +269,15 @@ button {
 
 </div>
 </div>
+</div>
 
 <script>
 
 const moodVerses = {
-
-Anxious:[
-"Breathe. Allah is near.",
-"Trust Him."
-],
-
-Depressed:[
-"With hardship comes ease.",
-"It will pass."
-],
-
-Fearful:[
-"Allah is with you.",
-"Fear not."
-],
-
-Restless:[
-"Remember Allah, hearts find peace.",
-"Pause."
-]
-
+Anxious:["Breathe. Allah is near.","Trust Him."],
+Depressed:["With hardship comes ease.","It will pass."],
+Fearful:["Allah is with you.","Fear not."],
+Restless:["Remember Allah, hearts find peace.","Pause."]
 };
 
 let currentMood="";
@@ -241,8 +287,8 @@ function startVerses(mood){
 currentMood=mood;
 loadVerses();
 
-document.getElementById("moodScreen").style.display="none";
-document.getElementById("verseScreen").style.display="block";
+document.getElementById("moodScreen").classList.add("hidden");
+document.getElementById("verseScreen").classList.remove("hidden");
 
 showVerse();
 }
@@ -257,18 +303,18 @@ const box=document.getElementById("verse");
 
 const v=currentList[Math.floor(Math.random()*currentList.length)];
 
-box.style.opacity=0;
+box.classList.remove("show");
 
 setTimeout(()=>{
 box.innerText=v;
-box.style.opacity=1;
-},200);
+box.classList.add("show");
+},150);
 
 }
 
 function goBack(){
-document.getElementById("verseScreen").style.display="none";
-document.getElementById("moodScreen").style.display="flex";
+document.getElementById("verseScreen").classList.add("hidden");
+document.getElementById("moodScreen").classList.remove("hidden");
 }
 
 function setBg(type){
@@ -277,52 +323,37 @@ if(type==="none")
 document.body.style.backgroundImage="none";
 
 if(type==="night")
-document.body.style.backgroundImage=
-"url('https://images.unsplash.com/photo-1506744038136-46273834b3fb')";
+document.body.style.backgroundImage="url('https://images.unsplash.com/photo-1506744038136-46273834b3fb')";
 
 if(type==="ocean")
-document.body.style.backgroundImage=
-"url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')";
+document.body.style.backgroundImage="url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')";
 
 if(type==="gradient")
-document.body.style.backgroundImage=
-"linear-gradient(120deg,#0f1115,#1f2937)";
-}
-
-function saveFavourite(){
-
-const verse=document.getElementById("verse").innerText;
-
-let favs=JSON.parse(localStorage.getItem("favs"))||[];
-
-favs.push(verse);
-
-localStorage.setItem("favs",JSON.stringify(favs));
-
-alert("Saved ⭐");
-}
-
-function viewFavourites(){
-
-let favs=JSON.parse(localStorage.getItem("favs"))||[];
-
-alert(favs.join("\n\n")||"No favourites yet.");
+document.body.style.backgroundImage="linear-gradient(120deg,#0f1115,#1f2937)";
 }
 
 function toggleSettings(){
-
 const p=document.getElementById("panel");
-
 p.style.display=p.style.display==="block"?"none":"block";
 }
 
 function toggleTheme(){
-
 document.body.classList.toggle("light");
+document.getElementById("themeBtn").innerText=
+document.body.classList.contains("light")?"☀️":"🌙";
+}
 
-const btn=document.getElementById("themeBtn");
+function saveFavourite(){
+const verse=document.getElementById("verse").innerText;
+let favs=JSON.parse(localStorage.getItem("favs"))||[];
+favs.push(verse);
+localStorage.setItem("favs",JSON.stringify(favs));
+alert("Saved ⭐");
+}
 
-btn.innerText=document.body.classList.contains("light")?"☀️":"🌙";
+function viewFavourites(){
+let favs=JSON.parse(localStorage.getItem("favs"))||[];
+alert(favs.join("\n\n")||"No favourites yet.");
 }
 
 </script>
