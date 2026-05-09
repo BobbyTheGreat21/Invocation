@@ -6,7 +6,7 @@
     <title>Najwa - Spiritual Comfort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --bg:#f7f8fa; --card:#ffffff; --text:#1f2937; --accent:#2563eb; --danger:#ef4444; }
+        :root { --bg:#f7f8fa; --card:#ffffff; --text:#1f2937; --accent:#2563eb; --danger:#ef4444; --gold:#d4af37; }
         body.dark { --bg:#0f1115; --card:#171a21; --text:#e6e6e6; --accent:#6ee7ff; }
         
         body { 
@@ -16,7 +16,7 @@
             overflow:hidden; transition: 0.3s ease; 
         }
 
-        button { border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:600; cursor:pointer; transition:0.2s ease; }
+        button { border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:600; cursor:pointer; transition:0.2s ease; outline: none; }
         body.dark button { color: #000; }
         button:hover { transform:translateY(-2px); filter: brightness(1.1); }
         button:active { transform:scale(0.97); }
@@ -25,7 +25,7 @@
         .panel { 
             display:none; position:absolute; right:0; top:45px; 
             background:var(--card); padding:14px; border-radius:14px; 
-            width:240px; box-shadow:0 10px 30px rgba(0,0,0,0.1); 
+            width:220px; box-shadow:0 10px 30px rgba(0,0,0,0.15); 
             animation:fadeIn 0.2s ease; 
         }
 
@@ -33,8 +33,8 @@
         .hidden { display:none !important; }
 
         .mood-card, .card { 
-            background:var(--card); padding:40px; border-radius:22px; 
-            text-align:center; max-width:600px; width:100%; 
+            background:var(--card); padding:40px; border-radius:24px; 
+            text-align:center; max-width:550px; width:100%; 
             box-shadow:0 20px 50px rgba(0,0,0,0.05); 
         }
 
@@ -42,24 +42,25 @@
         .moods button { padding:14px; border-radius:14px; color: var(--text); background: transparent; border: 1px solid var(--accent); }
         .moods button:hover { background: var(--accent); color: #fff; }
 
-        .verse { font-size:18px; line-height:1.8; min-height:120px; opacity:0; transition:0.25s ease; margin: 20px 0; white-space: pre-line; }
+        .verse { font-size:18px; line-height:1.8; min-height:130px; opacity:0; transition:0.25s ease; margin: 20px 0; white-space: pre-line; }
         .verse.show { opacity:1; }
 
-        #sanctuaryList { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; margin-top: 20px; }
+        /* Favourites List Styling */
+        #favList { width: 100%; max-width: 550px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; margin-top: 20px; }
         .fav-item { 
             background: var(--card); padding: 25px; border-radius: 18px; 
             text-align: left; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
             animation: fadeIn 0.3s ease; white-space: pre-line; line-height: 1.6;
-            display: flex; flex-direction: column;
         }
-        .unsave-btn { 
-            align-self: flex-end; background: transparent; color: var(--danger); 
-            font-size: 13px; margin-top: 15px; padding: 6px 12px; 
-            border: 1px solid var(--danger); border-radius: 8px;
-        }
+        .fav-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+        
+        .action-btn { background: transparent; font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid; }
+        .unsave-btn { color: var(--danger); border-color: var(--danger); }
         .unsave-btn:hover { background: var(--danger); color: white; }
+        .copy-btn { color: var(--accent); border-color: var(--accent); }
+        .copy-btn:hover { background: var(--accent); color: white; }
 
-        .nav-btn { background: transparent; color: var(--accent); padding: 10px; margin-bottom: 10px; }
+        .nav-btn { background: transparent; color: var(--accent); padding: 10px; margin-bottom: 10px; font-size: 14px; }
         .header-title { margin-top: 60px; font-weight: 600; font-size: 24px; }
 
         @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
@@ -72,14 +73,15 @@
     <div style="position:relative;">
         <button onclick="toggleSettings()" style="padding: 10px; background: transparent; font-size: 1.2rem;">⚙️</button>
         <div id="panel" class="panel">
-            <button style="width:100%; padding:10px;" onclick="viewSanctuary()">My Sanctuary ⭐</button>
+            <button style="width:100%; padding:10px; margin-bottom: 8px;" onclick="viewFavourites()">Favourites ⭐</button>
         </div>
     </div>
 </div>
 
+<!-- Mood Selection -->
 <div id="moodScreen" class="screen">
     <div class="mood-card">
-        <h1>How are you feeling?</h1>
+        <h1 style="margin-top:0;">How are you feeling?</h1>
         <div class="moods">
             <button onclick="startVerses('Anxious')">Anxious</button>
             <button onclick="startVerses('Depressed')">Depressed</button>
@@ -93,19 +95,24 @@
     </div>
 </div>
 
+<!-- Verse Display -->
 <div id="verseScreen" class="screen hidden">
     <div class="card">
         <button class="nav-btn" onclick="showScreen('moodScreen')">← Back to Moods</button>
         <div id="verse" class="verse"></div>
         <button style="width:100%; padding:14px; margin-bottom:10px;" onclick="showVerse()">Get another Du'a</button>
-        <button id="saveBtn" style="width:100%; padding:10px; background:transparent; border:1px solid #d4af37; color:#d4af37;" onclick="saveFavourite()">Save to Sanctuary ⭐</button>
+        <div style="display:flex; gap:10px;">
+            <button id="saveBtn" style="flex:2; padding:10px; background:transparent; border:1px solid var(--gold); color:var(--gold);" onclick="saveFavourite()">Save ⭐</button>
+            <button id="mainCopyBtn" style="flex:1; padding:10px; background:transparent; border:1px solid var(--accent); color:var(--accent);" onclick="copyCurrentVerse()">Copy 📋</button>
+        </div>
     </div>
 </div>
 
-<div id="sanctuaryScreen" class="screen hidden" style="justify-content: flex-start;">
-    <h2 class="header-title">My Sanctuary</h2>
+<!-- Favourites List -->
+<div id="favScreen" class="screen hidden" style="justify-content: flex-start;">
+    <h2 class="header-title">Favourites</h2>
     <button class="nav-btn" onclick="showScreen('moodScreen')">← Back Home</button>
-    <div id="sanctuaryList"></div>
+    <div id="favList"></div>
 </div>
 
 <script>
@@ -163,7 +170,7 @@ const moodVerses = {
         "قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَى أَنْفُسِهِمْ لَا تَقْنَطُوا\nQul ya ‘ibadiyalladhina asrafu ‘ala anfusihim la taqnatoo\nSay: O My servants who have transgressed against themselves, do not despair.",
         "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ\nRabbi ighfir li wa tub ‘alayya\nMy Lord, forgive me and accept my repentance.",
         "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي\nAllahumma innaka ‘afuwwun tuhibbul ‘afwa fa‘fu ‘anni\nO Allah, You are Most Forgiving and love forgiveness, so forgive me.",
-        "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ\nAstaghfirullaha wa atoobu ilayh\nI seek forgiveness from Allah and repent to Him.",
+        "أَسْتَغِِفْرُ اللَّهَ وَأَتُوبُ إِلَيْهِ\nAstaghfirullaha wa atoobu ilayh\nI seek forgiveness from Allah and repent to Him.",
         "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَمْ تَغْفِرْ لَنَا\nRabbana zalamna anfusana wa in lam taghfir lana\nOur Lord, we have wronged ourselves, and if You do not forgive us...",
         "اللَّهُمَّ اغْفِرْ لِي خَطِيئَتِي وَجَهْلِي\nAllahumma ighfir li khati’ati wa jahli\nO Allah, forgive me my sins and my ignorance.",
         "يَا رَبِّ إِنِّي ظَلَمْتُ نَفْسِي فَاغْفِرْ لِي\nYa Rabbi inni zalamtu nafsi faghfir li\nMy Lord, I have wronged myself, so forgive me.",
@@ -227,7 +234,9 @@ function startVerses(mood) {
 function showVerse() {
     const box = document.getElementById("verse");
     const saveBtn = document.getElementById("saveBtn");
+    const copyBtn = document.getElementById("mainCopyBtn");
     const list = moodVerses[currentMood];
+    
     let idx;
     do { idx = Math.floor(Math.random() * list.length); } while (idx === lastIndex && list.length > 1);
     lastIndex = idx;
@@ -236,8 +245,11 @@ function showVerse() {
     setTimeout(() => {
         box.innerText = list[idx];
         box.classList.add("show");
-        saveBtn.innerText = "Save to Sanctuary ⭐";
+        
+        // Reset buttons for the new verse
+        saveBtn.innerText = "Save ⭐";
         saveBtn.style.opacity = "1";
+        copyBtn.innerText = "Copy 📋";
     }, 50);
 }
 
@@ -251,37 +263,55 @@ function saveFavourite() {
         localStorage.setItem("favs", JSON.stringify(favs));
         saveBtn.innerText = "Saved!";
         saveBtn.style.opacity = "0.7";
-    } else {
-        alert("Already in your Sanctuary.");
     }
 }
 
-function viewSanctuary() {
-    const listDiv = document.getElementById("sanctuaryList");
+function copyCurrentVerse() {
+    const verse = document.getElementById("verse").innerText;
+    const copyBtn = document.getElementById("mainCopyBtn");
+    navigator.clipboard.writeText(verse).then(() => {
+        copyBtn.innerText = "Copied! ✅";
+        setTimeout(() => { copyBtn.innerText = "Copy 📋"; }, 2000);
+    });
+}
+
+function viewFavourites() {
+    const listDiv = document.getElementById("favList");
     const favs = JSON.parse(localStorage.getItem("favs")) || [];
     listDiv.innerHTML = "";
 
     if (favs.length === 0) {
-        listDiv.innerHTML = "<p style='text-align:center; opacity:0.6; margin-top:40px;'>Your sanctuary is empty. Save some Du'as to see them here.</p>";
+        listDiv.innerHTML = "<p style='text-align:center; opacity:0.5; margin-top:40px;'>Your favourites list is empty.</p>";
     } else {
         favs.forEach((v, index) => {
             const item = document.createElement("div");
             item.className = "fav-item";
             item.innerHTML = `
                 <div>${v}</div>
-                <button class="unsave-btn" onclick="removeFav(${index})">Unsave</button>
+                <div class="fav-actions">
+                    <button class="action-btn copy-btn" onclick="copySpecific('${v}', this)">Copy</button>
+                    <button class="action-btn unsave-btn" onclick="removeFav(${index})">Unsave</button>
+                </div>
             `;
             listDiv.appendChild(item);
         });
     }
-    showScreen('sanctuaryScreen');
+    showScreen('favScreen');
+}
+
+function copySpecific(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+        const oldText = btn.innerText;
+        btn.innerText = "Copied!";
+        setTimeout(() => { btn.innerText = oldText; }, 1500);
+    });
 }
 
 function removeFav(index) {
     let favs = JSON.parse(localStorage.getItem("favs")) || [];
     favs.splice(index, 1);
     localStorage.setItem("favs", JSON.stringify(favs));
-    viewSanctuary();
+    viewFavourites();
 }
 
 function toggleTheme() {
