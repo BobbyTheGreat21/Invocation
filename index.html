@@ -6,18 +6,23 @@
     <title>Najwa - Spiritual Comfort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --bg:#0f1115; --card:#171a21; --text:#e6e6e6; --accent:#6ee7ff; }
-        body.light { --bg:#f7f8fa; --card:#ffffff; --text:#1f2937; --accent:#2563eb; }
+        /* Default Light Mode */
+        :root { --bg:#f7f8fa; --card:#ffffff; --text:#1f2937; --accent:#2563eb; }
+        
+        /* Dark Mode Toggle */
+        body.dark { --bg:#0f1115; --card:#171a21; --text:#e6e6e6; --accent:#6ee7ff; }
         
         body { 
             margin:0; font-family:'Inter', sans-serif; 
             background: var(--bg); 
             color:var(--text); 
             height:100vh; display:flex; justify-content:center; align-items:center; 
-            overflow:hidden; transition:0.4s ease; 
+            overflow:hidden; transition: background-color 0.3s ease, color 0.3s ease; 
         }
 
-        button { border:none; border-radius:12px; background:var(--accent); color:#000; font-weight:600; cursor:pointer; transition:0.25s ease; }
+        button { border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:600; cursor:pointer; transition:0.2s ease; }
+        body.dark button { color: #000; } /* Dark mode accent buttons look better with black text */
+        
         button:hover { transform:translateY(-2px); filter: brightness(1.1); }
         button:active { transform:scale(0.97); }
 
@@ -25,9 +30,10 @@
         .panel { 
             display:none; position:absolute; right:0; top:45px; 
             background:var(--card); padding:14px; border-radius:14px; 
-            width:240px; box-shadow:0 10px 30px rgba(0,0,0,0.3); 
+            width:240px; box-shadow:0 10px 30px rgba(0,0,0,0.15); 
             animation:fadeIn 0.2s ease; 
         }
+        body.dark .panel { box-shadow:0 10px 30px rgba(0,0,0,0.4); }
 
         .screen { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; padding:20px; transition: 0.3s; }
         .hidden { display:none !important; }
@@ -35,20 +41,37 @@
         .mood-card, .card { 
             background:var(--card); padding:40px; border-radius:22px; 
             text-align:center; max-width:600px; width:100%; 
-            box-shadow:0 20px 50px rgba(0,0,0,0.35); 
+            box-shadow:0 20px 50px rgba(0,0,0,0.1); 
+            transition: background-color 0.3s ease;
         }
+        body.dark .mood-card, body.dark .card { box-shadow:0 20px 50px rgba(0,0,0,0.35); }
 
         .moods { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-top:20px; }
-        .moods button { padding:14px; border-radius:14px; color: var(--text); background: rgba(110, 231, 255, 0.1); border: 1px solid var(--accent); }
-        .moods button:hover { background: var(--accent); color: #000; }
+        
+        /* Mood buttons styled to look nice in both modes */
+        .moods button { 
+            padding:14px; border-radius:14px; color: var(--text); 
+            background: transparent; border: 1px solid var(--accent); 
+        }
+        .moods button:hover { background: var(--accent); color: #fff; }
+        body.dark .moods button:hover { color: #000; }
 
-        /* white-space: pre-line ensures the \n line breaks format the Arabic, Translit, and Meaning onto separate lines */
-        .verse { font-size:18px; line-height:1.8; min-height:120px; opacity:0; transform:translateY(8px); transition:0.4s ease; margin: 20px 0; white-space: pre-line; }
+        /* Verse display */
+        .verse { 
+            font-size:18px; line-height:1.8; min-height:120px; 
+            opacity:0; transform:translateY(5px); transition:0.25s ease; /* Faster transition */
+            margin: 20px 0; white-space: pre-line; 
+        }
         .verse.show { opacity:1; transform:translateY(0); }
 
         .verse-btn { padding:12px 20px; width: 100%; margin-top: 10px; }
         .back-btn { background: transparent; color: var(--accent); margin-bottom: 15px; font-size: 14px; }
-        .fav-btn { margin-top: 10px; background:transparent; border: 1px solid gold; color: gold; padding: 8px; width: 100%; }
+        .back-btn:hover { background: rgba(0,0,0,0.05); color: var(--accent); }
+        body.dark .back-btn:hover { background: rgba(255,255,255,0.05); color: var(--accent); }
+
+        .fav-btn { margin-top: 10px; background:transparent; border: 1px solid #d4af37; color: #d4af37; padding: 10px; width: 100%; }
+        .fav-btn:hover { background: #d4af37; color: #fff; }
+        body.dark .fav-btn:hover { color: #000; }
         
         .small-btn { width:100%; margin-bottom:6px; padding:9px; border-radius:10px; }
 
@@ -58,9 +81,10 @@
 <body>
 
 <div class="top">
-    <button id="themeBtn" onclick="toggleTheme()" style="padding: 10px;">🌙</button>
+    <!-- Icon defaults to moon because we are in light mode by default -->
+    <button id="themeBtn" onclick="toggleTheme()" style="padding: 10px; background: transparent; font-size: 1.2rem;">🌙</button>
     <div style="position:relative;">
-        <button onclick="toggleSettings()" style="padding: 10px;">⚙️</button>
+        <button onclick="toggleSettings()" style="padding: 10px; background: transparent; font-size: 1.2rem;">⚙️</button>
         <div id="panel" class="panel">
             <button class="small-btn" onclick="viewFavourites()">View Saved ⭐</button>
         </div>
@@ -193,9 +217,11 @@ const moodVerses = {
 };
 
 let currentMood = "";
+let currentVerseIndex = -1; // Added to track current verse
 
 function startVerses(mood) {
     currentMood = mood;
+    currentVerseIndex = -1; // Reset index when mood changes
     document.getElementById("moodScreen").classList.add("hidden");
     document.getElementById("verseScreen").classList.remove("hidden");
     showVerse();
@@ -204,13 +230,23 @@ function startVerses(mood) {
 function showVerse() {
     const box = document.getElementById("verse");
     const list = moodVerses[currentMood] || ["No Du'as found."];
-    const v = list[Math.floor(Math.random() * list.length)];
+    
+    // Prevent picking the exact same Du'a twice in a row
+    let newIndex;
+    do {
+        newIndex = Math.floor(Math.random() * list.length);
+    } while (newIndex === currentVerseIndex && list.length > 1);
+    
+    currentVerseIndex = newIndex;
+    const v = list[newIndex];
     
     box.classList.remove("show");
+    
+    // Reduced timeout duration drastically to make the transition feel snappy
     setTimeout(() => {
         box.innerText = v;
         box.classList.add("show");
-    }, 150);
+    }, 50); 
 }
 
 function goBack() {
@@ -224,8 +260,9 @@ function toggleSettings() {
 }
 
 function toggleTheme() {
-    document.body.classList.toggle("light");
-    document.getElementById("themeBtn").innerText = document.body.classList.contains("light") ? "☀️" : "🌙";
+    document.body.classList.toggle("dark");
+    // Show Sun when in Dark Mode, Moon when in Light Mode
+    document.getElementById("themeBtn").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
 }
 
 function saveFavourite() {
