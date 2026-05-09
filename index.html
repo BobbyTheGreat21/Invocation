@@ -15,7 +15,7 @@
             --text: #ffffff;
             --accent: #00d2ff;
             --btn-bg: rgba(255, 255, 255, 0.1);
-            --transition-speed: 0.8s;
+            --transition-speed: 0.6s;
         }
 
         /* --- THEME DEFINITIONS --- */
@@ -74,7 +74,7 @@
             z-index: 1000;
         }
 
-        /* --- WELCOME SCREEN (TAP ANYWHERE) --- */
+        /* --- WELCOME SCREEN --- */
         #welcomeScreen {
             position: absolute;
             inset: 0;
@@ -85,11 +85,11 @@
             cursor: pointer;
             z-index: 2000;
             background: var(--bg);
-            transition: opacity 1s ease, transform 1s ease;
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
         .welcome-content {
-            animation: fadeInWelcome 3.5s ease-out;
+            animation: fadeInWelcome 1.5s ease-out;
             text-align: center;
             padding: 40px;
         }
@@ -119,7 +119,7 @@
             letter-spacing: 5px;
             text-transform: uppercase; 
             opacity: 0.3;
-            animation: pulseHint 4s infinite ease-in-out;
+            animation: pulseHint 3s infinite ease-in-out;
         }
 
         @keyframes pulseHint {
@@ -128,7 +128,7 @@
         }
 
         @keyframes fadeInWelcome {
-            0% { opacity: 0; filter: blur(15px); transform: scale(0.95); }
+            0% { opacity: 0; filter: blur(10px); transform: scale(0.98); }
             100% { opacity: 1; filter: blur(0); transform: scale(1); }
         }
 
@@ -172,13 +172,13 @@
             align-items: center; 
             padding: 40px; 
             text-align: center; 
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
         .hidden { 
             opacity: 0 !important; 
             pointer-events: none; 
-            transform: translateY(20px); 
+            transform: translateY(15px); 
         }
 
         /* --- BUTTONS --- */
@@ -188,17 +188,14 @@
             background: var(--btn-bg); 
             color: var(--text); 
             cursor: pointer; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             backdrop-filter: blur(15px); 
             -webkit-backdrop-filter: blur(15px);
             outline: none; 
             font-family: 'Inter', sans-serif;
         }
 
-        button:hover { 
-            border-color: var(--accent); 
-            transform: translateY(-2px); 
-        }
+        button:active { transform: scale(0.95); }
 
         /* --- CONTENT AREAS --- */
         .moods { 
@@ -225,7 +222,7 @@
             max-width: 650px; 
             white-space: pre-line; 
             opacity: 0; 
-            transition: opacity 0.6s ease;
+            transition: opacity 0.4s ease;
         }
 
         .verse.show { 
@@ -245,7 +242,6 @@
 
 <div class="brand-name">Invocation</div>
 
-<!-- 1. WELCOME GATE -->
 <div id="welcomeScreen" onclick="enterApp()">
     <div class="welcome-content">
         <h1>Invocation</h1>
@@ -254,7 +250,6 @@
     <div class="tap-hint">Tap anywhere to begin</div>
 </div>
 
-<!-- TOP NAVIGATION (SETTINGS/FAVS) -->
 <div class="top-nav hidden" id="navUi">
     <button style="background:none; border:none; font-size:1.6rem; padding:10px; opacity:0.5;" onclick="toggleSettings()">⚙️</button>
     <div id="panel" class="panel">
@@ -270,7 +265,6 @@
     </div>
 </div>
 
-<!-- 2. MOOD SELECTION SCREEN -->
 <div id="moodScreen" class="screen hidden">
     <h2 style="font-weight:300; margin-bottom:40px; letter-spacing:1px; opacity:0.8;">How is your heart?</h2>
     <div class="moods">
@@ -285,7 +279,6 @@
     </div>
 </div>
 
-<!-- 3. VERSE DISPLAY SCREEN -->
 <div id="verseScreen" class="screen hidden">
     <button style="background:none; border:none; color:var(--accent); margin-bottom:30px; letter-spacing:2px; font-size:12px;" onclick="showScreen('moodScreen')">← BACK TO MOODS</button>
     <div id="verse" class="verse"></div>
@@ -298,7 +291,6 @@
     </div>
 </div>
 
-<!-- 4. FAVOURITES LIST SCREEN -->
 <div id="favScreen" class="screen hidden" style="justify-content:flex-start; overflow-y:auto;">
     <h2 style="margin-top:100px; font-weight:300; letter-spacing:4px; text-transform:uppercase; font-size:18px;">Saved</h2>
     <button style="background:none; border:none; color:var(--accent); margin-bottom:20px; font-size:12px; letter-spacing:2px;" onclick="showScreen('moodScreen')">← HOME</button>
@@ -306,7 +298,6 @@
 </div>
 
 <script>
-    /* --- DATA REPOSITORY --- */
     const moodVerses = {
         Anxious: [
             "اللهم إني أعوذ بك من الهم والحزن\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.",
@@ -350,7 +341,6 @@
         ]
     };
 
-    /* --- APP LOGIC --- */
     let currentMood = "";
     let lastIdx = -1;
 
@@ -359,26 +349,20 @@
         const nav = document.getElementById('navUi');
         const mood = document.getElementById('moodScreen');
 
-        // Cinematic exit transition
         welcome.style.opacity = '0';
-        welcome.style.transform = 'scale(1.05)';
+        welcome.style.transform = 'scale(1.02)';
         
         setTimeout(() => {
             welcome.style.display = 'none';
             nav.classList.remove('hidden');
             mood.classList.remove('hidden');
-        }, 800);
+        }, 400);
     }
 
     function showScreen(id) {
-        // Hide all screens
         document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-        // Hide settings panel
         document.getElementById('panel').style.display = "none";
-        
-        // Show target
-        const target = document.getElementById(id);
-        target.classList.remove('hidden');
+        document.getElementById(id).classList.remove('hidden');
     }
 
     function startVerses(mood) {
@@ -392,7 +376,6 @@
         const list = moodVerses[currentMood];
         let idx;
         
-        // Prevent showing the same verse twice in a row
         do { 
             idx = Math.floor(Math.random() * list.length); 
         } while (idx === lastIdx && list.length > 1);
@@ -404,7 +387,7 @@
             v.innerText = list[idx];
             v.classList.add('show');
             document.getElementById('saveBtn').innerText = "Save ⭐";
-        }, 150);
+        }, 100);
     }
 
     function setTheme(t) {
@@ -420,7 +403,6 @@
     function saveFavourite() {
         let favs = JSON.parse(localStorage.getItem('inv-favs')) || [];
         const text = document.getElementById('verse').innerText;
-        
         if(!favs.includes(text)) {
             favs.push(text);
             localStorage.setItem('inv-favs', JSON.stringify(favs));
@@ -438,9 +420,7 @@
     function viewFavourites() {
         const list = document.getElementById('favList');
         const favs = JSON.parse(localStorage.getItem('inv-favs')) || [];
-        
         list.innerHTML = favs.length ? "" : "<p style='opacity:0.4; margin-top:40px;'>No saved du'as yet.</p>";
-        
         favs.forEach((f, i) => {
             const d = document.createElement('div');
             d.className = 'fav-item';
@@ -460,12 +440,10 @@
         viewFavourites();
     }
 
-    // Initialize theme from storage
     window.onload = () => {
         const savedTheme = localStorage.getItem('inv-theme') || 'deepsea';
         setTheme(savedTheme);
     };
 </script>
-
 </body>
 </html>
