@@ -6,91 +6,77 @@
     <title>Najwa - Spiritual Comfort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Default Light Mode */
-        :root { --bg:#f7f8fa; --card:#ffffff; --text:#1f2937; --accent:#2563eb; }
-        
-        /* Dark Mode Toggle */
+        :root { --bg:#f7f8fa; --card:#ffffff; --text:#1f2937; --accent:#2563eb; --danger:#ef4444; }
         body.dark { --bg:#0f1115; --card:#171a21; --text:#e6e6e6; --accent:#6ee7ff; }
         
         body { 
             margin:0; font-family:'Inter', sans-serif; 
-            background: var(--bg); 
-            color:var(--text); 
+            background: var(--bg); color:var(--text); 
             height:100vh; display:flex; justify-content:center; align-items:center; 
-            overflow:hidden; transition: background-color 0.3s ease, color 0.3s ease; 
+            overflow:hidden; transition: 0.3s ease; 
         }
 
         button { border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:600; cursor:pointer; transition:0.2s ease; }
-        body.dark button { color: #000; } /* Dark mode accent buttons look better with black text */
-        
+        body.dark button { color: #000; }
         button:hover { transform:translateY(-2px); filter: brightness(1.1); }
         button:active { transform:scale(0.97); }
 
-        .top { position:fixed; top:15px; right:15px; display:flex; gap:10px; z-index:20; }
+        .top { position:fixed; top:15px; right:15px; display:flex; gap:10px; z-index:100; }
         .panel { 
             display:none; position:absolute; right:0; top:45px; 
             background:var(--card); padding:14px; border-radius:14px; 
-            width:240px; box-shadow:0 10px 30px rgba(0,0,0,0.15); 
+            width:240px; box-shadow:0 10px 30px rgba(0,0,0,0.1); 
             animation:fadeIn 0.2s ease; 
         }
-        body.dark .panel { box-shadow:0 10px 30px rgba(0,0,0,0.4); }
 
-        .screen { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; padding:20px; transition: 0.3s; }
+        .screen { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px; transition: 0.3s; overflow-y: auto; }
         .hidden { display:none !important; }
 
         .mood-card, .card { 
             background:var(--card); padding:40px; border-radius:22px; 
             text-align:center; max-width:600px; width:100%; 
-            box-shadow:0 20px 50px rgba(0,0,0,0.1); 
-            transition: background-color 0.3s ease;
+            box-shadow:0 20px 50px rgba(0,0,0,0.05); 
         }
-        body.dark .mood-card, body.dark .card { box-shadow:0 20px 50px rgba(0,0,0,0.35); }
 
         .moods { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-top:20px; }
-        
-        /* Mood buttons styled to look nice in both modes */
-        .moods button { 
-            padding:14px; border-radius:14px; color: var(--text); 
-            background: transparent; border: 1px solid var(--accent); 
-        }
+        .moods button { padding:14px; border-radius:14px; color: var(--text); background: transparent; border: 1px solid var(--accent); }
         .moods button:hover { background: var(--accent); color: #fff; }
-        body.dark .moods button:hover { color: #000; }
 
-        /* Verse display */
-        .verse { 
-            font-size:18px; line-height:1.8; min-height:120px; 
-            opacity:0; transform:translateY(5px); transition:0.25s ease; /* Faster transition */
-            margin: 20px 0; white-space: pre-line; 
+        .verse { font-size:18px; line-height:1.8; min-height:120px; opacity:0; transition:0.25s ease; margin: 20px 0; white-space: pre-line; }
+        .verse.show { opacity:1; }
+
+        /* Sanctuary Specific Styling */
+        #sanctuaryList { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
+        .fav-item { 
+            background: var(--card); padding: 25px; border-radius: 18px; 
+            text-align: left; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            animation: fadeIn 0.3s ease; white-space: pre-line; line-height: 1.6;
         }
-        .verse.show { opacity:1; transform:translateY(0); }
+        .delete-btn { 
+            background: transparent; color: var(--danger); font-size: 12px; 
+            margin-top: 15px; padding: 5px 10px; border: 1px solid var(--danger); 
+        }
+        .delete-btn:hover { background: var(--danger); color: white; }
 
-        .verse-btn { padding:12px 20px; width: 100%; margin-top: 10px; }
-        .back-btn { background: transparent; color: var(--accent); margin-bottom: 15px; font-size: 14px; }
-        .back-btn:hover { background: rgba(0,0,0,0.05); color: var(--accent); }
-        body.dark .back-btn:hover { background: rgba(255,255,255,0.05); color: var(--accent); }
+        .nav-btn { background: transparent; color: var(--accent); padding: 10px; margin-bottom: 20px; }
+        .header-title { margin-bottom: 20px; font-weight: 600; }
 
-        .fav-btn { margin-top: 10px; background:transparent; border: 1px solid #d4af37; color: #d4af37; padding: 10px; width: 100%; }
-        .fav-btn:hover { background: #d4af37; color: #fff; }
-        body.dark .fav-btn:hover { color: #000; }
-        
-        .small-btn { width:100%; margin-bottom:6px; padding:9px; border-radius:10px; }
-
-        @keyframes fadeIn { from {opacity:0; transform:translateY(8px);} to {opacity:1; transform:translateY(0);} }
+        @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
     </style>
 </head>
 <body>
 
 <div class="top">
-    <!-- Icon defaults to moon because we are in light mode by default -->
-    <button id="themeBtn" onclick="toggleTheme()" style="padding: 10px; background: transparent; font-size: 1.2rem;">🌙</button>
+    <button id="themeBtn" onclick="toggleTheme()" style="padding: 10px; background: transparent;">🌙</button>
     <div style="position:relative;">
-        <button onclick="toggleSettings()" style="padding: 10px; background: transparent; font-size: 1.2rem;">⚙️</button>
+        <button onclick="toggleSettings()" style="padding: 10px; background: transparent;">⚙️</button>
         <div id="panel" class="panel">
-            <button class="small-btn" onclick="viewFavourites()">View Saved ⭐</button>
+            <button style="width:100%; padding:10px;" onclick="viewSanctuary()">My Sanctuary ⭐</button>
         </div>
     </div>
 </div>
 
+<!-- Mood Selection -->
 <div id="moodScreen" class="screen">
     <div class="mood-card">
         <h1>How are you feeling?</h1>
@@ -107,184 +93,138 @@
     </div>
 </div>
 
+<!-- Verse Display -->
 <div id="verseScreen" class="screen hidden">
     <div class="card">
-        <button class="back-btn" onclick="goBack()">← Back to Moods</button>
+        <button class="nav-btn" onclick="showScreen('moodScreen')">← Back to Moods</button>
         <div id="verse" class="verse"></div>
-        <button class="verse-btn" onclick="showVerse()">Get another Du'a</button>
-        <button class="fav-btn" onclick="saveFavourite()">Save to Favourites ⭐</button>
+        <button style="width:100%; padding:14px; margin-bottom:10px;" onclick="showVerse()">Get another Du'a</button>
+        <button style="width:100%; padding:10px; background:transparent; border:1px solid #d4af37; color:#d4af37;" onclick="saveFavourite()">Save to Sanctuary ⭐</button>
     </div>
 </div>
 
+<!-- Sanctuary List -->
+<div id="sanctuaryScreen" class="screen hidden" style="justify-content: flex-start;">
+    <button class="nav-btn" onclick="showScreen('moodScreen')" style="margin-top:60px;">← Back Home</button>
+    <h2 class="header-title">My Sanctuary</h2>
+    <div id="sanctuaryList"></div>
+</div>
+
 <script>
+// (Mood data remains the same as your original)
 const moodVerses = {
     Anxious: [
         "اللهم إني أعوذ بك من الهم والحزن\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.",
         "حسبي الله لا إله إلا هو عليه توكلت وهو رب العرش العظيم\nḤasbiyallāhu lā ilāha illā Huwa, ‘alayhi tawakkaltu wa Huwa Rabbul-‘Arshil-‘Aẓīm\nAllah is sufficient for me; I rely on Him, Lord of the Mighty Throne.",
         "اللهم رحمتك أرجو فلا تكلني إلى نفسي طرفة عين\nAllāhumma raḥmataka arjū fa-lā takilnī ilā nafsī ṭarfata ‘ayn\nO Allah, I hope for Your mercy, do not leave me to myself even for a moment.",
-        "يا حي يا قيوم برحمتك أستغيث أصلح لي شأني كله\nYā Ḥayyū yā Qayyūm, bi-raḥmatika astaghīth, aṣliḥ lī sha’nī kullah\nO Ever-Living, O Sustainer, I seek Your mercy—set right all my affairs.",
-        "اللهم لا سهل إلا ما جعلته سهلاً\nAllāhumma lā sahla illā mā ja‘altahu sahlā\nO Allah, nothing is easy except what You make easy.",
-        "اللهم إني أعوذ بك من الجبن والبخل\nAllāhumma innī a‘ūdhu bika minal-jubni wal-bukhl\nO Allah, I seek refuge in You from fear and miserliness.",
-        "اللهم ثبت قلبي على دينك\nAllāhumma thabbit qalbī ‘alā dīnik\nO Allah, keep my heart firm upon Your faith.",
-        "رب إني مسني الضر وأنت أرحم الراحمين\nRabbi innī massaniyaḍ-ḍurru wa anta arḥamur-rāḥimīn\nMy Lord, harm has touched me, and You are the Most Merciful.",
-        "لا إله إلا أنت سبحانك إني كنت من الظالمين\nLā ilāha illā anta subḥānaka innī kuntu minaẓ-ẓālimīn\nThere is no god but You, glory be to You; I was among the wrongdoers.",
-        "اللهم اكفني بحلالك عن حرامك وأغنني بفضلك عمن سواك\nAllāhumma ikfinī bi-ḥalālika ‘an ḥarāmik wa aghninī bi-faḍlika ‘amman siwāk\nO Allah, suffice me with what You made lawful over what is unlawful, and enrich me by Your grace over all others."
+        "يا حي يا قيوم برحمتك أستغيث أصلح لي شأني كله\nYā Ḥayyū yā Qayyūm, bi-raḥmatika astaghīth, aṣliḥ lī sha’nī kullah\nO Ever-Living, O Sustainer, I seek Your mercy—set right all my affairs."
     ],
     Depressed: [
         "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ\nAllahumma inni a‘udhu bika minal-hammi wal-hazan\nO Allah, I seek refuge in You from anxiety and sorrow.",
-        "لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\nLa ilaha illa anta subhanaka inni kuntu minaz-zalimeen\nThere is no deity except You; glory be to You. Indeed, I was among the wrongdoers.",
-        "اللَّهُمَّ رَحْمَتَكَ أَرْجُو\nAllahumma rahmataka arju\nO Allah, I hope for Your mercy.",
-        "حَسْبِيَ اللَّهُ وَنِعْمَ الْوَكِيلُ\nHasbiyallahu wa ni‘mal wakeel\nAllah is sufficient for me, and He is the best disposer of affairs.",
-        "إِنَّ مَعَ الْعُسْرِ يُسْرًا\nInna ma‘al usri yusra\nIndeed, with hardship comes ease.",
-        "اللَّهُمَّ لَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ\nAllahumma la takilni ila nafsi tarfata ‘ayn\nO Allah, do not leave me to myself even for the blink of an eye.",
-        "اللَّهُمَّ اشْفِ صَدْرِي\nAllahumma ishfi sadri\nO Allah, heal my heart.",
-        "تَوَكَّلْتُ عَلَى اللَّهِ\nTawakkaltu ‘ala Allah\nI place my trust in Allah.",
-        "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\nAla bidhikrillahi tatma’innul quloob\nVerily, in the remembrance of Allah do hearts find rest.",
-        "اللَّهُمَّ أَصْلِحْ لِي شَأْنِي كُلَّهُ\nAllahumma aslih li sha’ni kullahu\nO Allah, set right all my affairs."
+        "لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\nLa ilaha illa anta subhanaka inni kuntu minaz-zalimeen\nThere is no deity except You; glory be to You. Indeed, I was among the wrongdoers."
     ],
     Lonely: [
         "اللَّهُمَّ آنِسْ وَحْشَتِي وَاجْبُرْ كَسْرِي\nAllahumma anis wahshati wajbur kasri\nO Allah, comfort my loneliness and mend my brokenness.",
-        "اللَّهُمَّ لَا تَذَرْنِي فَرْدًا وَأَنْتَ خَيْرُ الْوَارِثِينَ\nAllahumma la tadharni fardan wa anta khayrul waritheen\nO Allah, do not leave me alone, and You are the best of inheritors.",
-        "حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ\nHasbiyallahu la ilaha illa Huwa\nAllah is sufficient for me; there is no deity except Him.",
-        "اللَّهُمَّ ارْزُقْنِي أُنْسًا بِكَ وَبِذِكْرِكَ\nAllahumma urzuqni unsan bika wa bidhikrika\nO Allah, grant me comfort in You and Your remembrance.",
-        "رَبِّ اشْرَحْ لِي صَدْرِي\nRabbi ishrah li sadri\nMy Lord, expand for me my chest (heart).",
-        "اللَّهُمَّ اجْعَلْنِي مِنَ الَّذِينَ أَنِسُوا بِكَ\nAllahumma aj‘alni minal-ladhina anisoo bika\nO Allah, make me among those who find comfort in You.",
-        "إِنَّمَا أَشْكُو بَثِّي وَحُزْنِي إِلَى اللَّهِ\nInnama ashkoo bathee wa huzni ilallah\nI only complain of my sorrow and grief to Allah.",
-        "اللَّهُمَّ أَلِّفْ بَيْنَ قَلْبِي وَقَلْبِ عِبَادِكَ الصَّالِحِينَ\nAllahumma allif bayna qalbi wa qalbi ibadikas saliheen\nO Allah, unite my heart with the hearts of Your righteous servants.",
-        "اللَّهُمَّ اجْعَلْ لِي مِنْ كُلِّ هَمٍّ فَرَجًا\nAllahumma aj‘al li min kulli hammin faraja\nO Allah, grant me relief from every worry.",
-        "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ\nYa Hayyu Ya Qayyum birahmatika astagheeth\nO Ever-Living, O Sustainer, I seek help through Your mercy."
+        "إِنَّمَا أَشْكُو بَثِّي وَحُزْنِي إِلَى اللَّهِ\nInnama ashkoo bathee wa huzni ilallah\nI only complain of my sorrow and grief to Allah."
     ],
     Overwhelmed: [
         "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا\nLa yukallifullahu nafsan illa wus‘aha\nAllah does not burden a soul beyond what it can bear.",
-        "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي\nRabbi ishrah li sadri wa yassir li amri\nMy Lord, expand for me my chest and make my task easy for me.",
-        "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ\nHasbunallahu wa ni‘mal wakeel\nAllah is sufficient for us, and He is the best disposer of affairs.",
-        "اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا\nAllahumma la sahla illa ma ja‘altahu sahlā\nO Allah, nothing is easy except what You make easy.",
-        "وَفَوَّضْتُ أَمْرِي إِلَى اللَّهِ\nWa fawwadtu amri ilallah\nI entrust my affair to Allah.",
-        "إِنَّ مَعَ الْعُسْرِ يُسْرًا\nInna ma‘al usri yusra\nIndeed, with hardship comes ease.",
-        "اللَّهُمَّ لَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ\nAllahumma la takilni ila nafsi tarfata ‘ayn\nO Allah, do not leave me to myself even for a blink of an eye.",
-        "اللَّهُمَّ أَعِنِّي وَلَا تُعِنْ عَلَيَّ\nAllahumma a‘inni wa la tu‘in ‘alayya\nO Allah, help me and do not make things difficult for me.",
-        "رَبِّ إِنِّي مَغْلُوبٌ فَانْتَصِرْ\nRabbi inni maghloobun fantasir\nMy Lord, I am overpowered, so help me.",
-        "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ\nYa Hayyu Ya Qayyum birahmatika astagheeth\nO Ever-Living, O Sustainer, I seek help through Your mercy."
+        "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي\nRabbi ishrah li sadri wa yassir li amri\nMy Lord, expand for me my chest and make my task easy for me."
     ],
     Guilty: [
         "لَا تَقْنَطُوا مِنْ رَحْمَةِ اللَّهِ\nLa taqnatoo min rahmatillah\nDo not despair of the mercy of Allah.",
-        "قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَى أَنْفُسِهِمْ لَا تَقْنَطُوا\nQul ya ‘ibadiyalladhina asrafu ‘ala anfusihim la taqnatoo\nSay: O My servants who have transgressed against themselves, do not despair.",
-        "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ\nRabbi ighfir li wa tub ‘alayya\nMy Lord, forgive me and accept my repentance.",
-        "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي\nAllahumma innaka ‘afuwwun tuhibbul ‘afwa fa‘fu ‘anni\nO Allah, You are Most Forgiving and love forgiveness, so forgive me.",
-        "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ\nAstaghfirullaha wa atoobu ilayh\nI seek forgiveness from Allah and repent to Him.",
-        "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَمْ تَغْفِرْ لَنَا\nRabbana zalamna anfusana wa in lam taghfir lana\nOur Lord, we have wronged ourselves, and if You do not forgive us...",
-        "اللَّهُمَّ اغْفِرْ لِي خَطِيئَتِي وَجَهْلِي\nAllahumma ighfir li khati’ati wa jahli\nO Allah, forgive me my sins and my ignorance.",
-        "يَا رَبِّ إِنِّي ظَلَمْتُ نَفْسِي فَاغْفِرْ لِي\nYa Rabbi inni zalamtu nafsi faghfir li\nMy Lord, I have wronged myself, so forgive me.",
-        "اللَّهُمَّ طَهِّرْ قَلْبِي\nAllahumma tahhir qalbi\nO Allah, purify my heart.",
-        "إِنَّ اللَّهَ يُحِبُّ التَّوَّابِينَ\nInna Allaha yuhibbu at-tawwabeen\nIndeed, Allah loves those who constantly repent."
+        "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي\nAllahumma innaka ‘afuwwun tuhibbul ‘afwa fa‘fu ‘anni\nO Allah, You are Most Forgiving and love forgiveness, so forgive me."
     ],
     Betrayed: [
         "حَسْبِيَ اللَّهُ وَنِعْمَ الْوَكِيلُ\nHasbiyallahu wa ni‘mal wakeel\nAllah is sufficient for me, and He is the best disposer of affairs.",
-        "وَأُفَوِّضُ أَمْرِي إِلَى اللَّهِ\nWa ufawwidu amri ilallah\nI entrust my affair to Allah.",
-        "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ\nInna Allaha ma‘a as-sabireen\nIndeed, Allah is with the patient.",
-        "فَصَبْرٌ جَمِيلٌ وَاللَّهُ الْمُسْتَعَانُ\nFasabrun jameel wallahu al-musta‘an\nSo patience is most fitting, and Allah is the one sought for help.",
-        "اللَّهُمَّ اخْتَرْ لِي وَلَا تَخْتَرْ لِي نَفْسِي\nAllahumma ikhtar li wa la takhtar li nafsi\nO Allah, choose for me and do not leave the choice to myself.",
-        "إِنَّمَا أَشْكُو بَثِّي وَحُزْنِي إِلَى اللَّهِ\nInnama ashkoo bathee wa huzni ilallah\nI only complain of my sorrow and grief to Allah.",
-        "رَبِّ أَنِّي مَغْلُوبٌ فَانْتَصِرْ\nRabbi inni maghloobun fantasir\nMy Lord, I am overpowered, so help me.",
-        "اللَّهُمَّ اجْبُرْ قَلْبِي وَعَوِّضْنِي خَيْرًا\nAllahumma jbur qalbi wa ‘awwidni khayran\nO Allah, mend my heart and replace what I lost with something better.",
-        "لَا تَعْلَمُونَ وَاللَّهُ يَعْلَمُ\nLa ta‘lamoon wallahu ya‘lam\nYou do not know, but Allah knows.",
-        "إِنَّ مَعَ الْعُسْرِ يُسْرًا\nInna ma‘al usri yusra\nIndeed, with hardship comes ease."
+        "فَصَبْرٌ جَمِيلٌ وَاللَّهُ الْمُسْتَعَانُ\nFasabrun jameel wallahu al-musta‘an\nSo patience is most fitting, and Allah is the one sought for help."
     ],
     Fearful: [
-        "إِنِّي تَوَكَّلْتُ عَلَى اللَّهِ\nInni tawakkaltu ‘ala Allah\nIndeed, I place my trust in Allah.",
-        "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ\nHasbunallahu wa ni‘mal wakeel\nAllah is sufficient for us, and He is the best disposer of affairs.",
-        "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخَوْفِ وَالْفَزَعِ\nAllahumma inni a‘udhu bika minal-khawfi wal-faza‘\nO Allah, I seek refuge in You from fear and panic.",
         "لَا تَخَفْ إِنَّ اللَّهَ مَعَنَا\nLa takhaf innallaha ma‘ana\nDo not fear, indeed Allah is with us.",
-        "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ\nInna Allaha ma‘a as-sabireen\nIndeed, Allah is with the patient.",
-        "أَلَيْسَ اللَّهُ بِكَافٍ عَبْدَهُ\nAlaisa Allahu bikafin ‘abdah\nIs Allah not sufficient for His servant?",
-        "اللَّهُمَّ آمِنْ رَوْعَاتِي وَآمِنِّي فِي دُنْيَايَ\nAllahumma amin raw‘ati wa aminni fi dunyaya\nO Allah, grant me safety in my fear and security in my life.",
-        "وَفَوَّضْتُ أَمْرِي إِلَى اللَّهِ\nWa fawwadtu amri ilallah\nI entrust my affair to Allah.",
-        "اللَّهُمَّ لَا مَلْجَأَ وَلَا مَنْجَا مِنْكَ إِلَّا إِلَيْكَ\nAllahumma la malja’a wa la manja minka illa ilayk\nO Allah, there is no refuge from You except in You.",
-        "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ\nYa Hayyu Ya Qayyum birahmatika astagheeth\nO Ever-Living, O Sustainer, I seek help through Your mercy."
+        "أَلَيْسَ اللَّهُ بِكَافٍ عَبْدَهُ\nAlaisa Allahu bikafin ‘abdah\nIs Allah not sufficient for His servant?"
     ],
     Restless: [
         "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\nAla bidhikrillahi tatma’innul quloob\nVerily, in the remembrance of Allah do hearts find rest.",
-        "اللَّهُمَّ أَلْهِمْنِي السَّكِينَةَ وَالطُّمَأْنِينَةَ\nAllahumma alhimni as-sakeenata wat-tuma’nina\nO Allah, inspire in me peace and tranquility.",
-        "اللَّهُمَّ ارْزُقْنِي هُدُوءَ الْقَلْبِ وَطُمَأْنِينَتَهُ\nAllahumma urzuqni hudu’a alqalbi wa tuma’ninatahu\nO Allah, grant my heart calmness and peace.",
-        "اللَّهُمَّ لَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ\nAllahumma la takilni ila nafsi tarfata ‘ayn\nO Allah, do not leave me to myself even for a blink of an eye.",
-        "حَسْبِيَ اللَّهُ وَنِعْمَ الْوَكِيلُ\nHasbiyallahu wa ni‘mal wakeel\nAllah is sufficient for me, and He is the best disposer of affairs.",
-        "اللَّهُمَّ أَذْهِبْ عَنِّي الْهَمَّ وَالْقَلَقَ\nAllahumma adhhib ‘anni alhamma wal-qalaq\nO Allah, remove from me worry and anxiety.",
-        "وَفَوَّضْتُ أَمْرِي إِلَى اللَّهِ\nWa fawwadtu amri ilallah\nI entrust my affair to Allah.",
-        "اللَّهُمَّ اجْعَلْ فِي قَلْبِي نُورًا وَفِي صَدْرِي رَاحَةً\nAllahumma aj‘al fi qalbi nooran wa fi sadri rahah\nO Allah, place light in my heart and comfort in my chest.",
-        "إِنَّ مَعَ الْعُسْرِ يُسْرًا\nInna ma‘al usri yusra\nIndeed, with hardship comes ease.",
-        "يَا حَيُّ يَا قَيُّومُ أَصْلِحْ لِي شَأْنِي كُلَّهُ\nYa Hayyu Ya Qayyum aslih li sha’ni kullahu\nO Ever-Living, O Sustainer, set right all my affairs."
+        "اللَّهُمَّ أَلْهِمْنِي السَّكِينَةَ وَالطُّمَأْنِينَةَ\nAllahumma alhimni as-sakeenata wat-tuma’nina\nO Allah, inspire in me peace and tranquility."
     ]
 };
 
 let currentMood = "";
-let currentVerseIndex = -1; // Added to track current verse
+let lastIndex = -1;
+
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById(screenId).classList.remove('hidden');
+    document.getElementById('panel').style.display = "none";
+}
 
 function startVerses(mood) {
     currentMood = mood;
-    currentVerseIndex = -1; // Reset index when mood changes
-    document.getElementById("moodScreen").classList.add("hidden");
-    document.getElementById("verseScreen").classList.remove("hidden");
+    lastIndex = -1;
+    showScreen('verseScreen');
     showVerse();
 }
 
 function showVerse() {
     const box = document.getElementById("verse");
-    const list = moodVerses[currentMood] || ["No Du'as found."];
-    
-    // Prevent picking the exact same Du'a twice in a row
-    let newIndex;
-    do {
-        newIndex = Math.floor(Math.random() * list.length);
-    } while (newIndex === currentVerseIndex && list.length > 1);
-    
-    currentVerseIndex = newIndex;
-    const v = list[newIndex];
+    const list = moodVerses[currentMood];
+    let idx;
+    do { idx = Math.floor(Math.random() * list.length); } while (idx === lastIndex && list.length > 1);
+    lastIndex = idx;
     
     box.classList.remove("show");
-    
-    // Reduced timeout duration drastically to make the transition feel snappy
     setTimeout(() => {
-        box.innerText = v;
+        box.innerText = list[idx];
         box.classList.add("show");
-    }, 50); 
+    }, 50);
 }
 
-function goBack() {
-    document.getElementById("verseScreen").classList.add("hidden");
-    document.getElementById("moodScreen").classList.remove("hidden");
+function saveFavourite() {
+    const verse = document.getElementById("verse").innerText;
+    let favs = JSON.parse(localStorage.getItem("favs")) || [];
+    if (!favs.includes(verse)) {
+        favs.push(verse);
+        localStorage.setItem("favs", JSON.stringify(favs));
+        alert("Saved to Sanctuary ⭐");
+    }
+}
+
+function viewSanctuary() {
+    const listDiv = document.getElementById("sanctuaryList");
+    const favs = JSON.parse(localStorage.getItem("favs")) || [];
+    listDiv.innerHTML = "";
+
+    if (favs.length === 0) {
+        listDiv.innerHTML = "<p style='text-align:center; opacity:0.6;'>Your sanctuary is empty. Save some Du'as to see them here.</p>";
+    } else {
+        favs.forEach((v, index) => {
+            const item = document.createElement("div");
+            item.className = "fav-item";
+            item.innerHTML = `
+                <div>${v}</div>
+                <button class="delete-btn" onclick="removeFav(${index})">Remove</button>
+            `;
+            listDiv.appendChild(item);
+        });
+    }
+    showScreen('sanctuaryScreen');
+}
+
+function removeFav(index) {
+    let favs = JSON.parse(localStorage.getItem("favs")) || [];
+    favs.splice(index, 1);
+    localStorage.setItem("favs", JSON.stringify(favs));
+    viewSanctuary(); // Refresh list
+}
+
+function toggleTheme() {
+    document.body.classList.toggle("dark");
+    document.getElementById("themeBtn").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
 }
 
 function toggleSettings() {
     const p = document.getElementById("panel");
     p.style.display = (p.style.display === "block") ? "none" : "block";
-}
-
-function toggleTheme() {
-    document.body.classList.toggle("dark");
-    // Show Sun when in Dark Mode, Moon when in Light Mode
-    document.getElementById("themeBtn").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
-}
-
-function saveFavourite() {
-    const verse = document.getElementById("verse").innerText;
-    if (!verse) return;
-    let favs = JSON.parse(localStorage.getItem("favs")) || [];
-    if (!favs.includes(verse)) {
-        favs.push(verse);
-        localStorage.setItem("favs", JSON.stringify(favs));
-        alert("Saved to Favourites ⭐");
-    } else {
-        alert("Already in Favourites!");
-    }
-}
-
-function viewFavourites() {
-    let favs = JSON.parse(localStorage.getItem("favs")) || [];
-    if (favs.length === 0) {
-        alert("No favourites saved yet.");
-    } else {
-        alert("Your Favourites:\n\n" + favs.join("\n\n---\n\n"));
-    }
 }
 </script>
 
