@@ -20,124 +20,230 @@
             --btn-bg: rgba(0, 0, 0, 0.2);
         }
 
-        body.mist {
-            --bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --text: #1f2937;
-            --accent: #2563eb;
-            --btn-bg: rgba(255, 255, 255, 0.4);
-        }
-        body.midnight {
-            --bg: linear-gradient(135deg, #0f1115 0%, #1a1d23 100%);
-            --text: #e6e6e6;
-            --accent: #6ee7ff;
-            --btn-bg: rgba(255, 255, 255, 0.05);
-        }
-        body.olive {
-            --bg: linear-gradient(135deg, #ebebe0 0%, #a3ad91 100%);
-            --text: #2f3e30;
-            --accent: #4a5d4b;
-            --btn-bg: rgba(255, 255, 255, 0.3);
-        }
-        body.golden {
-            --bg: linear-gradient(135deg, #fff1eb 0%, #ffdf91 100%);
-            --text: #4a3728;
-            --accent: #b3932d;
-            --btn-bg: rgba(255, 255, 255, 0.5);
-        }
+        body.mist { --bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); --text: #1f2937; --accent: #2563eb; --btn-bg: rgba(255, 255, 255, 0.4); }
+        body.midnight { --bg: linear-gradient(135deg, #0f1115 0%, #1a1d23 100%); --text: #e6e6e6; --accent: #6ee7ff; --btn-bg: rgba(255, 255, 255, 0.05); }
+        body.olive { --bg: linear-gradient(135deg, #ebebe0 0%, #a3ad91 100%); --text: #2f3e30; --accent: #4a5d4b; --btn-bg: rgba(255, 255, 255, 0.3); }
+        body.golden { --bg: linear-gradient(135deg, #fff1eb 0%, #ffdf91 100%); --text: #4a3728; --accent: #b3932d; --btn-bg: rgba(255, 255, 255, 0.5); }
 
         body { 
-            margin:0; font-family:'Inter', sans-serif; 
+            margin: 0; 
+            font-family: 'Inter', sans-serif; 
             background: var(--bg); 
             background-attachment: fixed;
-            color:var(--text); 
-            height:100vh; display:flex; justify-content:center; align-items:center; 
-            overflow:hidden; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+            color: var(--text); 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden; 
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
         .brand-name {
             position: fixed;
             top: 30px;
             left: 30px;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 5px;
             text-transform: uppercase;
             opacity: 0.5;
             font-weight: 600;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .screen { 
-            position:absolute; inset:0; 
-            display:flex; flex-direction:column; justify-content:center; align-items:center; 
-            padding:30px; text-align:center; transition: 0.3s; 
+            position: absolute; 
+            inset: 0; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 30px; 
+            text-align: center; 
+            transition: 0.5s ease-in-out; 
             overflow-y: auto;
         }
-        .hidden { display:none !important; }
+
+        .hidden { 
+            opacity: 0; 
+            pointer-events: none; 
+            display: none !important; 
+        }
+
+        /* Welcome Screen Styling */
+        .welcome-content {
+            animation: fadeInWelcome 2.5s ease-out;
+        }
+
+        #welcomeScreen h1 {
+            font-weight: 300;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+
+        #welcomeScreen p {
+            font-style: italic;
+            opacity: 0.8;
+            font-weight: 300;
+            letter-spacing: 1px;
+            max-width: 300px;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeInWelcome {
+            from { opacity: 0; transform: translateY(10px); filter: blur(5px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
 
         button { 
-            border: 1px solid rgba(128,128,128,0.2); 
-            border-radius:16px; 
+            border: 1px solid rgba(128, 128, 128, 0.2); 
+            border-radius: 16px; 
             background: var(--btn-bg); 
-            color:var(--text); 
-            font-weight:500; 
-            cursor:pointer; 
-            transition:0.3s ease; 
+            color: var(--text); 
+            font-weight: 500; 
+            cursor: pointer; 
+            transition: 0.3s ease; 
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             outline: none;
         }
-        button:hover { transform: translateY(-2px); border-color: var(--accent); }
 
-        .top-nav { position:fixed; top:20px; right:20px; z-index:100; }
-        .settings-btn { background: transparent; border: none; font-size: 1.5rem; padding: 10px; cursor: pointer; opacity: 0.7; }
+        button:hover { 
+            transform: translateY(-2px); 
+            border-color: var(--accent); 
+        }
+
+        .top-nav { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 100; 
+        }
+
+        .settings-btn { 
+            background: transparent; 
+            border: none; 
+            font-size: 1.5rem; 
+            padding: 10px; 
+            cursor: pointer; 
+            opacity: 0.7; 
+        }
 
         .panel { 
-            display:none; position:absolute; right:0; top:60px; 
-            background: var(--btn-bg); backdrop-filter: blur(25px);
+            display: none; 
+            position: absolute; 
+            right: 0; 
+            top: 60px; 
+            background: var(--btn-bg); 
+            backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            padding:20px; border-radius:24px; width:220px; 
-            border: 1px solid rgba(128,128,128,0.2);
+            padding: 20px; 
+            border-radius: 24px; 
+            width: 220px; 
+            border: 1px solid rgba(128, 128, 128, 0.2);
             animation: fadeIn 0.2s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        .panel h4 { margin: 15px 0 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
-        .theme-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px; }
-        .theme-option { padding: 10px; font-size: 13px; text-align: left; width: 100%; border-radius: 10px; }
+        .theme-grid { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 8px; 
+            margin-top: 10px; 
+        }
+
+        .theme-option { 
+            padding: 10px; 
+            font-size: 13px; 
+            text-align: left; 
+            width: 100%; 
+            border-radius: 10px; 
+        }
 
         .moods { 
-            display:grid; grid-template-columns:repeat(2, 1fr); 
-            gap:15px; margin-top:30px; width: 100%; max-width: 400px;
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; 
+            width: 100%; 
+            max-width: 400px;
         }
-        .moods button { padding:20px 10px; font-size: 15px; }
+
+        .moods button { 
+            padding: 20px 10px; 
+            font-size: 15px; 
+        }
 
         .verse { 
-            font-size:22px; line-height:1.8; font-weight: 300;
-            min-height:180px; opacity:0; transition:0.4s ease; 
-            margin: 40px 0; max-width: 600px; white-space: pre-line;
+            font-size: 22px; 
+            line-height: 1.8; 
+            font-weight: 300;
+            min-height: 180px; 
+            opacity: 0; 
+            transition: 0.4s ease; 
+            margin: 40px 0; 
+            max-width: 600px; 
+            white-space: pre-line;
         }
-        .verse.show { opacity:1; }
 
-        #favList { width: 100%; max-width: 600px; margin-top: 20px; padding-bottom: 50px; }
+        .verse.show { opacity: 1; }
+
+        #favList { 
+            width: 100%; 
+            max-width: 600px; 
+            margin-top: 20px; 
+            padding-bottom: 50px; 
+        }
+
         .fav-item { 
-            padding: 30px; border-bottom: 1px solid rgba(128,128,128,0.1);
-            text-align: left; animation: fadeIn 0.3s ease; white-space: pre-line;
+            padding: 30px; 
+            border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+            text-align: left; 
+            animation: fadeIn 0.3s ease; 
+            white-space: pre-line;
         }
 
-        .nav-btn { background: transparent; border: none; color: var(--accent); margin-bottom: 20px; }
-        h1 { font-weight: 300; letter-spacing: -1px; font-size: 32px; }
-        @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
+        .nav-btn { 
+            background: transparent; 
+            border: none; 
+            color: var(--accent); 
+            margin-bottom: 20px; 
+            cursor: pointer;
+        }
+
+        h1 { 
+            font-weight: 300; 
+            letter-spacing: -1px; 
+            font-size: 32px; 
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
     </style>
 </head>
 <body class="deepsea">
 
 <div class="brand-name">Invocation</div>
 
-<div class="top-nav">
+<!-- 1. Invitee Welcome Screen -->
+<div id="welcomeScreen" class="screen">
+    <div class="welcome-content">
+        <h1>Invocation</h1>
+        <p>"Whispered du’as for every state of the heart"</p>
+        <button style="margin-top: 40px; padding: 15px 45px; letter-spacing: 2px; font-size: 12px; text-transform: uppercase;" onclick="enterApp()">
+            Enter
+        </button>
+    </div>
+</div>
+
+<div class="top-nav hidden" id="navUi">
     <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
     <div id="panel" class="panel">
-        <button style="width:100%; padding:12px; margin-bottom: 10px;" onclick="viewFavourites()">⭐ Favourites</button>
-        <h4>Themes</h4>
+        <button style="width: 100%; padding: 12px; margin-bottom: 10px;" onclick="viewFavourites()">⭐ Favourites</button>
+        <h4 style="font-size: 10px; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; margin: 15px 0 10px 0;">Themes</h4>
         <div class="theme-grid">
             <button class="theme-option" onclick="setTheme('deepsea')">Deep Sea</button>
             <button class="theme-option" onclick="setTheme('mist')">Morning Mist</button>
@@ -148,7 +254,7 @@
     </div>
 </div>
 
-<div id="moodScreen" class="screen">
+<div id="moodScreen" class="screen hidden">
     <h1>How are you feeling?</h1>
     <div class="moods">
         <button onclick="startVerses('Anxious')">Anxious</button>
@@ -165,11 +271,11 @@
 <div id="verseScreen" class="screen hidden">
     <button class="nav-btn" onclick="showScreen('moodScreen')">← Back to Moods</button>
     <div id="verse" class="verse"></div>
-    <div style="width: 100%; max-width: 400px; display:flex; flex-direction:column; gap:10px;">
-        <button style="padding:16px;" onclick="showVerse()">Get another Du'a</button>
-        <div style="display:flex; gap:10px;">
-            <button id="saveBtn" style="flex:1; padding:12px;" onclick="saveFavourite()">Save ⭐</button>
-            <button id="mainCopyBtn" style="flex:1; padding:12px;" onclick="copyCurrentVerse()">Copy 📋</button>
+    <div style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 10px;">
+        <button style="padding: 16px;" onclick="showVerse()">Get another Du'a</button>
+        <div style="display: flex; gap: 10px;">
+            <button id="saveBtn" style="flex: 1; padding: 12px;" onclick="saveFavourite()">Save ⭐</button>
+            <button id="mainCopyBtn" style="flex: 1; padding: 12px;" onclick="copyCurrentVerse()">Copy 📋</button>
         </div>
     </div>
 </div>
@@ -251,7 +357,7 @@ const moodVerses = {
     Fearful: [
         "إِنِّي تَوَكَّلْتُ عَلَى اللَّهِ\nInni tawakkaltu ‘ala Allah\nIndeed, I place my trust in Allah.",
         "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ\nHasbunallahu wa ni‘mal wakeel\nAllah is sufficient for us.",
-        "لَا تَخَفْ إِنَّ اللَّهَ مَعَنَا\nLa takhaf innallaha ma‘ana\nDo not fear, indeed Allah is with us.",
+        "لَا تَخافْ إِنَّ اللَّهَ مَعَنَا\nLa takhaf innallaha ma‘ana\nDo not fear, indeed Allah is with us.",
         "أَلَيْسَ اللَّهُ بِكَافٍ عَبْدَهُ\nAlaisa Allahu bikafin ‘abdah\nIs Allah not sufficient for His servant?",
         "اللَّهُمَّ آمِنْ رَوْعَاتِي\nAllahumma amin raw‘ati\nO Allah, grant me safety in my fear."
     ],
@@ -266,9 +372,28 @@ const moodVerses = {
 let currentMood = "";
 let lastIndex = -1;
 
+function enterApp() {
+    const welcome = document.getElementById('welcomeScreen');
+    const mood = document.getElementById('moodScreen');
+    const nav = document.getElementById('navUi');
+
+    welcome.style.opacity = '0';
+    setTimeout(() => {
+        welcome.classList.add('hidden');
+        nav.classList.remove('hidden');
+        mood.classList.remove('hidden');
+        setTimeout(() => {
+            nav.style.opacity = '1';
+            mood.style.opacity = '1';
+        }, 50);
+    }, 500);
+}
+
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-    document.getElementById(screenId).classList.remove('hidden');
+    const target = document.getElementById(screenId);
+    target.classList.remove('hidden');
+    target.style.opacity = '1';
     document.getElementById('panel').style.display = "none";
 }
 
@@ -333,7 +458,7 @@ function viewFavourites() {
     favs.forEach((v, index) => {
         const item = document.createElement("div");
         item.className = "fav-item";
-        item.innerHTML = `<div>${v}</div><button onclick="removeFav(${index})" style="color:red; background:none; border:none; margin-top:15px; cursor:pointer;">Unsave</button>`;
+        item.innerHTML = `<div>${v}</div><button onclick="removeFav(${index})" style="color:#ff4d4d; background:none; border:none; margin-top:15px; cursor:pointer; font-size:12px;">Unsave</button>`;
         listDiv.appendChild(item);
     });
     showScreen('favScreen');
