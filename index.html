@@ -52,11 +52,6 @@ button {
   color:#000;
   font-weight:600;
   cursor:pointer;
-  transition:0.2s;
-}
-
-button:hover {
-  transform:scale(1.03);
 }
 
 .top {
@@ -65,7 +60,6 @@ button:hover {
   right:15px;
   display:flex;
   gap:10px;
-  z-index:10;
 }
 
 .settings {
@@ -82,8 +76,6 @@ button:hover {
   border-radius:10px;
   width:240px;
 }
-
-/* MOOD SCREEN */
 
 .mood-screen {
   position:absolute;
@@ -111,10 +103,7 @@ button:hover {
 
 .moods button {
   padding:14px;
-  font-size:15px;
 }
-
-/* VERSE */
 
 .container {
   text-align:center;
@@ -150,8 +139,6 @@ button:hover {
   background:gold;
 }
 
-/* SETTINGS UI */
-
 .setting-title {
   margin:10px 0 6px;
   font-size:13px;
@@ -162,7 +149,6 @@ button:hover {
   width:100%;
   margin-bottom:6px;
   padding:8px;
-  font-size:12px;
 }
 </style>
 </head>
@@ -171,294 +157,172 @@ button:hover {
 
 <div class="top">
 
-  <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+<button id="themeBtn" onclick="toggleTheme()">🌙</button>
 
-  <div class="settings">
+<div class="settings">
 
-    <button onclick="toggleSettings()">⚙️</button>
+<button onclick="toggleSettings()">⚙️</button>
 
-    <div id="panel" class="panel">
+<div id="panel" class="panel">
 
-      <!-- VERSE STYLE -->
-      <div class="setting-title">Verse Style</div>
+<div class="setting-title">Themes</div>
 
-      <button class="small-btn" onclick="setStyle('all')">All</button>
-      <button class="small-btn" onclick="setStyle('calm')">Calm</button>
-      <button class="small-btn" onclick="setStyle('motivational')">Motivational</button>
-      <button class="small-btn" onclick="setStyle('deep')">Deep</button>
-      <button class="small-btn" onclick="setStyle('short')">Short</button>
+<button class="small-btn" onclick="setBg('none')">Default</button>
+<button class="small-btn" onclick="setBg('night')">Night Sky</button>
+<button class="small-btn" onclick="setBg('ocean')">Ocean</button>
+<button class="small-btn" onclick="setBg('gradient')">Gradient</button>
 
-      <!-- BACKGROUNDS -->
-      <div class="setting-title">Background</div>
+<div class="setting-title">Favourites</div>
 
-      <button class="small-btn" onclick="setBg('none')">Default</button>
-      <button class="small-btn" onclick="setBg('night')">Night Sky</button>
-      <button class="small-btn" onclick="setBg('ocean')">Ocean</button>
-      <button class="small-btn" onclick="setBg('gradient')">Gradient</button>
-
-      <!-- FAVORITES -->
-      <div class="setting-title">Favourites</div>
-
-      <button class="small-btn" onclick="viewFavourites()">View ⭐</button>
-
-    </div>
-
-  </div>
+<button class="small-btn" onclick="viewFavourites()">View ⭐</button>
 
 </div>
+</div>
+</div>
 
-<!-- MOOD SCREEN -->
 <div id="moodScreen" class="mood-screen">
+<div class="mood-card">
 
-  <div class="mood-card">
+<h1>How are you feeling?</h1>
 
-    <h1>How are you feeling?</h1>
-
-    <div class="moods">
-
-      <button onclick="startVerses('Anxious')">Anxious</button>
-      <button onclick="startVerses('Depressed')">Depressed</button>
-      <button onclick="startVerses('Apathetic')">Apathetic</button>
-      <button onclick="startVerses('Irritable')">Irritable</button>
-      <button onclick="startVerses('Hopeless')">Hopeless</button>
-      <button onclick="startVerses('Melancholy')">Melancholy</button>
-      <button onclick="startVerses('Overwhelmed')">Overwhelmed</button>
-      <button onclick="startVerses('Resentful')">Resentful</button>
-      <button onclick="startVerses('Lonely')">Lonely</button>
-      <button onclick="startVerses('Guilty')">Guilty</button>
-      <button onclick="startVerses('Fearful')">Fearful</button>
-      <button onclick="startVerses('Restless')">Restless</button>
-
-    </div>
-
-  </div>
-
+<div class="moods">
+<button onclick="startVerses('Anxious')">Anxious</button>
+<button onclick="startVerses('Depressed')">Depressed</button>
+<button onclick="startVerses('Fearful')">Fearful</button>
+<button onclick="startVerses('Restless')">Restless</button>
 </div>
 
-<!-- VERSE SCREEN -->
+</div>
+</div>
+
 <div class="container" id="verseScreen" style="display:none;">
+<div class="card">
 
-  <div class="card">
+<button class="back-btn" onclick="goBack()">← Back</button>
 
-    <button class="back-btn" onclick="goBack()">← Back</button>
+<div id="verse" class="verse"></div>
 
-    <div id="verse" class="verse"></div>
+<button class="verse-btn" onclick="showVerse()">A Du'a, please</button>
+<button class="fav-btn" onclick="saveFavourite()">⭐</button>
 
-    <button class="verse-btn" onclick="showVerse()">A Du'a, please</button>
-    <button class="fav-btn" onclick="saveFavourite()">⭐</button>
-
-  </div>
-
+</div>
 </div>
 
 <script>
 
-/* =========================
-   DATA (MOODS + STYLES)
-========================= */
-
 const moodVerses = {
 
-  Anxious: {
-    calm: ["Breathe. Allah is near."],
-    motivational: ["Do not lose hope."],
-    deep: ["Your heart is not alone."],
-    short: ["Trust Him."]
-  },
+Anxious:[
+"Breathe. Allah is near.",
+"Trust Him."
+],
 
-  Depressed: {
-    calm: ["With hardship comes ease."],
-    motivational: ["Keep going."],
-    deep: ["Allah sees what you feel."],
-    short: ["It will pass."]
-  },
+Depressed:[
+"With hardship comes ease.",
+"It will pass."
+],
 
-  Fearful: {
-    calm: ["Allah is with you."],
-    motivational: ["Face it with faith."],
-    deep: ["Nothing happens without His will."],
-    short: ["Fear not."]
-  },
+Fearful:[
+"Allah is with you.",
+"Fear not."
+],
 
-  Restless: {
-    calm: ["Remember Allah, hearts find peace."],
-    motivational: ["Slow down."],
-    deep: ["Rest is also worship."],
-    short: ["Pause."]
-  }
+Restless:[
+"Remember Allah, hearts find peace.",
+"Pause."
+]
 
 };
 
-/* =========================
-   STATE
-========================= */
+let currentMood="";
+let currentList=[];
 
-let currentMood = "";
-let currentStyle = "all";
-let currentList = [];
+function startVerses(mood){
+currentMood=mood;
+loadVerses();
 
-/* =========================
-   START
-========================= */
+document.getElementById("moodScreen").style.display="none";
+document.getElementById("verseScreen").style.display="block";
 
-function startVerses(mood) {
-
-  currentMood = mood;
-
-  loadVerses();
-
-  document.getElementById("moodScreen").style.display = "none";
-  document.getElementById("verseScreen").style.display = "block";
-
-  showVerse();
+showVerse();
 }
 
-/* =========================
-   LOAD VERSES BASED ON STYLE
-========================= */
-
-function loadVerses() {
-
-  const data = moodVerses[currentMood];
-
-  if (!data) {
-    currentList = ["No verses found"];
-    return;
-  }
-
-  if (currentStyle === "all") {
-
-    currentList = Object.values(data).flat();
-
-  } else {
-
-    currentList = data[currentStyle] || [];
-  }
+function loadVerses(){
+currentList=moodVerses[currentMood]||["No du'as found"];
 }
 
-/* =========================
-   VERSE
-========================= */
+function showVerse(){
 
-function showVerse() {
+const box=document.getElementById("verse");
 
-  const box = document.getElementById("verse");
+const v=currentList[Math.floor(Math.random()*currentList.length)];
 
-  if (!currentList.length) return;
+box.style.opacity=0;
 
-  const v = currentList[Math.floor(Math.random() * currentList.length)];
+setTimeout(()=>{
+box.innerText=v;
+box.style.opacity=1;
+},200);
 
-  box.style.opacity = 0;
-
-  setTimeout(() => {
-    box.innerText = v;
-    box.style.opacity = 1;
-  }, 200);
 }
 
-/* =========================
-   BACK
-========================= */
-
-function goBack() {
-
-  document.getElementById("verseScreen").style.display = "none";
-  document.getElementById("moodScreen").style.display = "flex";
+function goBack(){
+document.getElementById("verseScreen").style.display="none";
+document.getElementById("moodScreen").style.display="flex";
 }
 
-/* =========================
-   STYLE FILTER
-========================= */
+function setBg(type){
 
-function setStyle(style) {
+if(type==="none")
+document.body.style.backgroundImage="none";
 
-  currentStyle = style;
+if(type==="night")
+document.body.style.backgroundImage=
+"url('https://images.unsplash.com/photo-1506744038136-46273834b3fb')";
 
-  if (currentMood) {
-    loadVerses();
-    showVerse();
-  }
+if(type==="ocean")
+document.body.style.backgroundImage=
+"url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')";
+
+if(type==="gradient")
+document.body.style.backgroundImage=
+"linear-gradient(120deg,#0f1115,#1f2937)";
 }
 
-/* =========================
-   BACKGROUNDS
-========================= */
+function saveFavourite(){
 
-function setBg(type) {
+const verse=document.getElementById("verse").innerText;
 
-  if (type === "none") {
-    document.body.style.backgroundImage = "none";
-  }
+let favs=JSON.parse(localStorage.getItem("favs"))||[];
 
-  if (type === "night") {
-    document.body.style.backgroundImage =
-      "url('https://images.unsplash.com/photo-1506744038136-46273834b3fb')";
-  }
+favs.push(verse);
 
-  if (type === "ocean") {
-    document.body.style.backgroundImage =
-      "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')";
-  }
+localStorage.setItem("favs",JSON.stringify(favs));
 
-  if (type === "gradient") {
-    document.body.style.backgroundImage =
-      "linear-gradient(120deg,#0f1115,#1f2937)";
-  }
+alert("Saved ⭐");
 }
 
-/* =========================
-   FAVORITES
-========================= */
+function viewFavourites(){
 
-function saveFavourite() {
+let favs=JSON.parse(localStorage.getItem("favs"))||[];
 
-  const verse =
-    document.getElementById("verse").innerText;
-
-  let favs =
-    JSON.parse(localStorage.getItem("favs")) || [];
-
-  favs.push(verse);
-
-  localStorage.setItem("favs", JSON.stringify(favs));
-
-  alert("Saved ⭐");
+alert(favs.join("\n\n")||"No favourites yet.");
 }
 
-function viewFavourites() {
+function toggleSettings(){
 
-  let favs =
-    JSON.parse(localStorage.getItem("favs")) || [];
+const p=document.getElementById("panel");
 
-  alert(favs.join("\n\n") || "No favourites yet.");
+p.style.display=p.style.display==="block"?"none":"block";
 }
 
-/* =========================
-   SETTINGS
-========================= */
+function toggleTheme(){
 
-function toggleSettings() {
+document.body.classList.toggle("light");
 
-  const p = document.getElementById("panel");
+const btn=document.getElementById("themeBtn");
 
-  p.style.display =
-    p.style.display === "block" ? "none" : "block";
-}
-
-/* =========================
-   THEME
-========================= */
-
-function toggleTheme() {
-
-  document.body.classList.toggle("light");
-
-  const btn = document.getElementById("themeBtn");
-
-  btn.innerText =
-    document.body.classList.contains("light")
-      ? "☀️"
-      : "🌙";
+btn.innerText=document.body.classList.contains("light")?"☀️":"🌙";
 }
 
 </script>
