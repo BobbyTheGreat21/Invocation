@@ -1,270 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Najwa</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Najwa - Spiritual Comfort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#0f1115; --card:#171a21; --text:#e6e6e6; --accent:#6ee7ff; }
+        body.light { --bg:#f7f8fa; --card:#ffffff; --text:#1f2937; --accent:#2563eb; }
+        
+        body { 
+            margin:0; font-family:'Inter', sans-serif; 
+            background: var(--bg); 
+            color:var(--text); 
+            height:100vh; display:flex; justify-content:center; align-items:center; 
+            overflow:hidden; transition:0.4s ease; 
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+        button { border:none; border-radius:12px; background:var(--accent); color:#000; font-weight:600; cursor:pointer; transition:0.25s ease; }
+        button:hover { transform:translateY(-2px); filter: brightness(1.1); }
+        button:active { transform:scale(0.97); }
 
-<style>
-:root {
-  --bg:#0f1115;
-  --card:#171a21;
-  --text:#e6e6e6;
-  --accent:#6ee7ff;
-}
+        .top { position:fixed; top:15px; right:15px; display:flex; gap:10px; z-index:20; }
+        .panel { 
+            display:none; position:absolute; right:0; top:45px; 
+            background:var(--card); padding:14px; border-radius:14px; 
+            width:240px; box-shadow:0 10px 30px rgba(0,0,0,0.3); 
+            animation:fadeIn 0.2s ease; 
+        }
 
-body.light {
-  --bg:#f7f8fa;
-  --card:#ffffff;
-  --text:#1f2937;
-  --accent:#2563eb;
-}
+        .screen { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; padding:20px; transition: 0.3s; }
+        .hidden { display:none !important; }
 
-body {
-  margin:0;
-  font-family:Inter;
-  background:linear-gradient(180deg,var(--bg),#0b0d10);
-  color:var(--text);
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  overflow:hidden;
-  transition:0.4s ease;
-}
+        .mood-card, .card { 
+            background:var(--card); padding:40px; border-radius:22px; 
+            text-align:center; max-width:600px; width:100%; 
+            box-shadow:0 20px 50px rgba(0,0,0,0.35); 
+        }
 
-button {
-  border:none;
-  border-radius:12px;
-  background:var(--accent);
-  color:#000;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.25s ease;
-}
+        .moods { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-top:20px; }
+        .moods button { padding:14px; border-radius:14px; color: var(--text); background: rgba(110, 231, 255, 0.1); border: 1px solid var(--accent); }
+        .moods button:hover { background: var(--accent); color: #000; }
 
-button:hover { transform:translateY(-2px); }
-button:active { transform:scale(0.97); }
+        .verse { font-size:18px; line-height:1.7; min-height:120px; opacity:0; transform:translateY(8px); transition:0.4s ease; margin: 20px 0; }
+        .verse.show { opacity:1; transform:translateY(0); }
 
-.top {
-  position:fixed;
-  top:15px;
-  right:15px;
-  display:flex;
-  gap:10px;
-  z-index:20;
-}
+        .verse-btn { padding:12px 20px; width: 100%; margin-top: 10px; }
+        .back-btn { background: transparent; color: var(--accent); margin-bottom: 15px; font-size: 14px; }
+        .fav-btn { margin-top: 10px; background:transparent; border: 1px solid gold; color: gold; padding: 8px; width: 100%; }
+        
+        .setting-title { margin:10px 0 6px; font-size:12px; opacity:0.7; text-align: left; }
+        .small-btn { width:100%; margin-bottom:6px; padding:9px; border-radius:10px; }
 
-.panel {
-  display:none;
-  position:absolute;
-  right:0;
-  top:45px;
-  background:var(--card);
-  padding:14px;
-  border-radius:14px;
-  width:240px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.3);
-}
-
-.screen {
-  position:absolute;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
-}
-
-.hidden { display:none !important; }
-
-.mood-card, .card {
-  background:var(--card);
-  padding:42px;
-  border-radius:22px;
-  text-align:center;
-  max-width:720px;
-  width:100%;
-  box-shadow:0 20px 50px rgba(0,0,0,0.35);
-}
-
-.moods {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:12px;
-  margin-top:20px;
-}
-
-.verse {
-  font-size:20px;
-  line-height:1.7;
-  min-height:120px;
-  opacity:0;
-  transform:translateY(8px);
-  transition:0.4s ease;
-}
-
-.verse.show {
-  opacity:1;
-  transform:translateY(0);
-}
-</style>
+        @keyframes fadeIn { from {opacity:0; transform:translateY(8px);} to {opacity:1; transform:translateY(0);} }
+    </style>
 </head>
-
 <body>
 
 <div class="top">
-<button id="themeBtn" onclick="toggleTheme()">🌙</button>
-
-<div style="position:relative;">
-<button onclick="toggleSettings()">⚙️</button>
-
-<div id="panel" class="panel">
-<div style="font-size:12px; opacity:0.7;">Favourites</div>
-<button onclick="viewFavourites()">View ⭐</button>
-</div>
-
-</div>
+    <button id="themeBtn" onclick="toggleTheme()" style="padding: 10px;">🌙</button>
+    <div style="position:relative;">
+        <button onclick="toggleSettings()" style="padding: 10px;">⚙️</button>
+        <div id="panel" class="panel">
+            <div class="setting-title">Favourites</div>
+            <button class="small-btn" onclick="viewFavourites()">View Saved ⭐</button>
+        </div>
+    </div>
 </div>
 
 <!-- MOOD SCREEN -->
 <div id="moodScreen" class="screen">
-<div class="mood-card">
-<h1>How are you feeling?</h1>
-
-<div class="moods">
-<button onclick="startVerses('Anxious')">Anxious</button>
-<button onclick="startVerses('Depressed')">Depressed</button>
-<button onclick="startVerses('Lonely')">Lonely</button>
-<button onclick="startVerses('Overwhelmed')">Overwhelmed</button>
-<button onclick="startVerses('Guilty')">Guilty</button>
-<button onclick="startVerses('Betrayed')">Betrayed</button>
-<button onclick="startVerses('Fearful')">Fearful</button>
-<button onclick="startVerses('Restless')">Restless</button>
-</div>
-
-</div>
+    <div class="mood-card">
+        <h1>How are you feeling?</h1>
+        <div class="moods">
+            <button onclick="startVerses('Anxious')">Anxious</button>
+            <button onclick="startVerses('Depressed')">Depressed</button>
+            <button onclick="startVerses('Lonely')">Lonely</button>
+            <button onclick="startVerses('Overwhelmed')">Overwhelmed</button>
+            <button onclick="startVerses('Guilty')">Ashamed</button>
+            <button onclick="startVerses('Betrayed')">Betrayed</button>
+            <button onclick="startVerses('Fearful')">Fearful</button>
+            <button onclick="startVerses('Restless')">Restless</button>
+        </div>
+    </div>
 </div>
 
 <!-- VERSE SCREEN -->
 <div id="verseScreen" class="screen hidden">
-<div class="card">
-
-<button onclick="goBack()">← Back</button>
-
-<div id="verse" class="verse"></div>
-
-<button onclick="showVerse()">A Du'a, please</button>
-<button onclick="saveFavourite()">⭐</button>
-
-</div>
+    <div class="card">
+        <button class="back-btn" onclick="goBack()">← Back to Moods</button>
+        <div id="verse" class="verse"></div>
+        <button class="verse-btn" onclick="showVerse()">Get another Du'a</button>
+        <button class="fav-btn" onclick="saveFavourite()">Save to Favourites ⭐</button>
+    </div>
 </div>
 
 <script>
-
 const moodVerses = {
-
-Anxious: [
-`اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ`,
-`حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ`,
-`لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ`
-],
-
-Depressed: [
-`اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ`,
-`لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ`,
-`إِنَّ مَعَ الْعُسْرِ يُسْرًا`,
-`حَسْبِيَ اللَّهُ وَنِعْمَ الْوَكِيلُ`
-],
-
-Lonely: [
-`اللَّهُمَّ آنِسْ وَحْشَتِي وَاجْبُرْ كَسْرِي`,
-`حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ`
-],
-
-Overwhelmed: [
-`لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا`,
-`رَبِّ اشْرَحْ لِي صَدْرِي`
-],
-
-Guilty: [
-`لَا تَقْنَطُوا مِنْ رَحْمَةِ اللَّهِ`,
-`إِنَّ اللَّهَ يُحِبُّ التَّوَّابِينَ`
-],
-
-Betrayed: [
-`حَسْبِيَ اللَّهُ وَنِعْمَ الْوَكِيلُ`,
-`إِنَّ اللَّهَ مَعَ الصَّابِرِينَ`
-],
-
-Fearful: [
-`إِنِّي تَوَكَّلْتُ عَلَى اللَّهِ`,
-`لَا تَخَفْ إِنَّ اللَّهَ مَعَنَا`
-],
-
-Restless: [
-`أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ`,
-`اللَّهُمَّ أَلْهِمْنِي السَّكِينَةَ`
-]
-
+    Anxious: [
+        "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ\n(O Allah, I seek refuge in You from anxiety and sorrow.)",
+        "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ\n(Allah is sufficient for us, and He is the best disposer of affairs.)",
+        "لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\n(There is no deity except You; glory be to You. Indeed, I was among the wrongdoers.)"
+    ],
+    Depressed: [
+        "إِنَّ مَعَ الْعُسْرِ يُسْرًا\n(Indeed, with hardship comes ease.)",
+        "اللَّهُمَّ رَحْمَتَكَ أَرْجُو\n(O Allah, I hope for Your mercy.)",
+        "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\n(Verily, in the remembrance of Allah do hearts find rest.)"
+    ],
+    Lonely: [
+        "اللَّهُمَّ آنِسْ وَحْشَتِي\n(O Allah, comfort my loneliness.)",
+        "اللَّهُمَّ لَا تَذَرْنِي فَرْدًا وَأَنْتَ خَيْرُ الْوَارِثِينَ\n(O Allah, do not leave me alone, and You are the best of inheritors.)",
+        "إِنَّمَا أَشْكُو بَثِّي وَحُزْنِي إِلَى اللَّهِ\n(I only complain of my sorrow and grief to Allah.)"
+    ],
+    Overwhelmed: [
+        "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا\n(Allah does not burden a soul beyond what it can bear.)",
+        "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي\n(My Lord, expand for me my chest and make my task easy for me.)",
+        "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ\n(O Ever-Living, O Sustainer, I seek help through Your mercy.)"
+    ],
+    Guilty: [
+        "لَا تَقْنَطُوا مِنْ رَحْمَةِ اللَّهِ\n(Do not despair of the mercy of Allah.)",
+        "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي\n(O Allah, You are Most Forgiving and love forgiveness, so forgive me.)",
+        "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ\n(My Lord, forgive me and accept my repentance.)"
+    ],
+    Betrayed: [
+        "فَصَبْرٌ جَمِيلٌ وَاللَّهُ الْمُسْتَعَانُ\n(So patience is most fitting, and Allah is the one sought for help.)",
+        "وَأُفَوِّضُ أَمْرِي إِلَى اللَّهِ\n(I entrust my affair to Allah.)",
+        "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ\n(Indeed, Allah is with the patient.)"
+    ],
+    Fearful: [
+        "لَا تَخَفْ إِنَّ اللَّهَ مَعَنَا\n(Do not fear, indeed Allah is with us.)",
+        "أَلَيْسَ اللَّهَ بِكَافٍ عَبْدَهُ\n(Is Allah not sufficient for His servant?)",
+        "إِنِّي تَوَكَّلْتُ عَلَى اللَّهِ\n(Indeed, I place my trust in Allah.)"
+    ],
+    Restless: [
+        "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\n(Verily, in the remembrance of Allah do hearts find rest.)",
+        "اللَّهُمَّ أَلْهِمْنِي السَّكِينَةَ\n(O Allah, inspire in me peace and tranquility.)"
+    ]
 };
 
-let currentMood="";
-let currentList=[];
+let currentMood = "";
 
-function startVerses(mood){
-currentMood=mood;
-currentList=moodVerses[mood]||["No du'a found"];
-
-document.getElementById("moodScreen").classList.add("hidden");
-document.getElementById("verseScreen").classList.remove("hidden");
-
-showVerse();
+function startVerses(mood) {
+    currentMood = mood;
+    document.getElementById("moodScreen").classList.add("hidden");
+    document.getElementById("verseScreen").classList.remove("hidden");
+    showVerse();
 }
 
-function showVerse(){
-const box=document.getElementById("verse");
-const v=currentList[Math.floor(Math.random()*currentList.length)];
-
-box.classList.remove("show");
-
-setTimeout(()=>{
-box.innerText=v;
-box.classList.add("show");
-},150);
+function showVerse() {
+    const box = document.getElementById("verse");
+    const list = moodVerses[currentMood] || ["No Du'as found."];
+    const v = list[Math.floor(Math.random() * list.length)];
+    
+    box.classList.remove("show");
+    setTimeout(() => {
+        box.innerText = v;
+        box.classList.add("show");
+    }, 150);
 }
 
-function goBack(){
-document.getElementById("verseScreen").classList.add("hidden");
-document.getElementById("moodScreen").classList.remove("hidden");
+function goBack() {
+    document.getElementById("verseScreen").classList.add("hidden");
+    document.getElementById("moodScreen").classList.remove("hidden");
 }
 
-function toggleSettings(){
-const p=document.getElementById("panel");
-p.style.display=p.style.display==="block"?"none":"block";
+function toggleSettings() {
+    const p = document.getElementById("panel");
+    p.style.display = (p.style.display === "block") ? "none" : "block";
 }
 
-function toggleTheme(){
-document.body.classList.toggle("light");
-document.getElementById("themeBtn").innerText=
-document.body.classList.contains("light")?"🌙":"☀️";
+function toggleTheme() {
+    document.body.classList.toggle("light");
+    document.getElementById("themeBtn").innerText = document.body.classList.contains("light") ? "☀️" : "🌙";
 }
 
-function saveFavourite(){
-const verse=document.getElementById("verse").innerText;
-let favs=JSON.parse(localStorage.getItem("favs"))||[];
-favs.push(verse);
-localStorage.setItem("favs",JSON.stringify(favs));
-alert("Saved ⭐");
+function saveFavourite() {
+    const verse = document.getElementById("verse").innerText;
+    if (!verse) return;
+    let favs = JSON.parse(localStorage.getItem("favs")) || [];
+    if (!favs.includes(verse)) {
+        favs.push(verse);
+        localStorage.setItem("favs", JSON.stringify(favs));
+        alert("Saved to Favourites ⭐");
+    } else {
+        alert("Already in Favourites!");
+    }
 }
 
-function viewFavourites(){
-let favs=JSON.parse(localStorage.getItem("favs"))||[];
-alert(favs.join("\n\n")||"No favourites yet.");
+function viewFavourites() {
+    let favs = JSON.parse(localStorage.getItem("favs")) || [];
+    if (favs.length === 0) {
+        alert("No favourites saved yet.");
+    } else {
+        alert("Your Favourites:\n\n" + favs.join("\n\n---\n\n"));
+    }
 }
-
 </script>
 
 </body>
