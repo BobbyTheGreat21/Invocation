@@ -1,0 +1,21 @@
+{
+  "name": "Invocation",
+  "short_name": "Invocation",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#09203f",
+  "theme_color": "#09203f",
+  "description": "Whispered du’as for every state of the heart",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/09203f/ffffff?text=I",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512/09203f/ffffff?text=Invocation",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
