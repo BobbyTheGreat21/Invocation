@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Invocation</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -26,30 +26,43 @@
         body.golden { --bg: linear-gradient(135deg, #fff1eb 0%, #ffdf91 100%); --text: #4a3728; --accent: #b3932d; --btn-bg: rgba(255, 255, 255, 0.15); --card-bg: rgba(255, 255, 255, 0.1); }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
         body { 
-            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); 
-            height: 100vh; width: 100vw; overflow: hidden; transition: background 0.6s ease; user-select: none;
+            font-family: 'Inter', sans-serif; 
+            color: var(--text); 
+            transition: background 0.6s ease; 
+            user-select: none;
         }
 
         header {
             position: fixed; top: 0; left: 0; right: 0;
-            padding: calc(25px + var(--sat, 0px)) 30px 25px; 
+            padding: calc(20px + var(--sat, 0px)) 25px 15px; 
             display: flex; justify-content: space-between; align-items: center; 
             z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
             transition: opacity 0.5s ease;
         }
+        header.visible { opacity: 1; pointer-events: auto; }
 
         .brand { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; opacity: 0.6; cursor: pointer; }
-        .settings-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: inherit; padding: 5px; }
+        .settings-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: inherit; padding: 8px; }
 
         .panel { 
-            position: absolute; right: 30px; top: calc(75px + var(--sat, 0px)); 
+            position: absolute; right: 25px; top: calc(75px + var(--sat, 0px)); 
             background: var(--btn-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            padding: 25px; border-radius: 28px; width: 260px; border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 20px; border-radius: 24px; width: 240px; border: 1px solid rgba(255, 255, 255, 0.1); 
             z-index: 2100; opacity: 0; pointer-events: none; transform: translateY(-10px); transition: 0.3s ease;
         }
         .panel.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        .panel-btn { width: 100%; padding: 14px; margin-bottom: 8px; border-radius: 16px; font-size: 13px; text-align: left; background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .panel-btn { width: 100%; padding: 12px; margin-bottom: 6px; border-radius: 12px; font-size: 13px; text-align: left; background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
 
         .screen { 
             position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -62,7 +75,7 @@
         .screen-scroll { overflow-y: auto; display: block; -webkit-overflow-scrolling: touch; }
 
         #welcomeScreen { 
-            z-index: 3000 !important; 
+            z-index: 5000; 
             background: var(--bg); 
             text-align: center; 
             cursor: pointer; 
@@ -70,7 +83,6 @@
             pointer-events: auto; 
             transform: none; 
             padding-top: 0; 
-            transition: opacity 0.8s ease, transform 0.8s ease;
         }
         #welcomeScreen.fade-out {
             opacity: 0;
@@ -78,14 +90,15 @@
             transform: scale(1.05);
         }
 
-        .welcome-title { font-weight: 300; letter-spacing: 16px; text-transform: uppercase; font-size: 2.2rem; margin-bottom: 20px; }
-        .welcome-subtitle { font-style: italic; opacity: 0.6; line-height: 2; font-size: 15px; }
+        .welcome-title { font-weight: 300; letter-spacing: 12px; text-transform: uppercase; font-size: 2rem; margin-bottom: 20px; }
+        .welcome-subtitle { font-style: italic; opacity: 0.6; line-height: 1.8; font-size: 15px; }
 
         .mood-container { width: 100%; overflow-x: auto; display: flex; scroll-snap-type: x mandatory; padding: 40px 0; scrollbar-width: none; }
         .mood-container::-webkit-scrollbar { display: none; }
         .mood-card {
             flex: 0 0 75vw; height: 380px; margin: 0 10px; background: var(--card-bg); 
-            backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 40px; 
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 40px; 
             scroll-snap-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center; cursor: pointer; transition: transform 0.2s;
         }
@@ -93,7 +106,7 @@
         .mood-card h3 { font-size: 26px; font-weight: 300; margin-bottom: 10px; }
         .mood-card p { font-size: 12px; opacity: 0.5; font-style: italic; padding: 0 30px; }
 
-        .back-nav { background: none; border: none; color: var(--accent); margin-bottom: 20px; letter-spacing: 3px; font-size: 10px; cursor: pointer; text-transform: uppercase; font-weight: 600; width: fit-content; padding: 10px; }
+        .back-nav { background: none; border: none; color: var(--accent); margin-bottom: 20px; letter-spacing: 3px; font-size: 10px; cursor: pointer; text-transform: uppercase; font-weight: 600; padding: 10px; }
 
         .arabic { font-family: 'Amiri', serif; font-size: 32px; line-height: 2; margin-bottom: 15px; direction: rtl; text-align: center; }
         .translit { font-size: 14px; opacity: 0.6; font-style: italic; margin-bottom: 10px; text-align: center; line-height: 1.5; padding: 0 10px; }
@@ -111,11 +124,11 @@
         .toast {
             position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 30px;
-            font-size: 12px; transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); opacity: 0; z-index: 5000;
+            font-size: 12px; transition: 0.4s; opacity: 0; z-index: 6000; pointer-events: none;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        #loading { position: fixed; inset: 0; background: var(--bg); z-index: 6000; display: none; align-items: center; justify-content: center; }
+        #loading { position: fixed; inset: 0; background: var(--bg); z-index: 7000; display: none; align-items: center; justify-content: center; }
         .loader { width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -124,7 +137,7 @@
 
 <div id="loading"><div class="loader"></div></div>
 
-<header id="appHeader" style="opacity: 0; pointer-events: none;">
+<header id="appHeader">
     <div class="brand" onclick="navigate('moodScreen')">Invocation</div>
     <button class="settings-btn" onclick="togglePanel(event)">⚙️</button>
     <div id="settingsPanel" class="panel">
@@ -189,7 +202,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const dbData = {
         Anxious: [
@@ -208,7 +221,6 @@
         Ashamed: [
             "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ\nLā taqnaṭū min raḥmatillāh\nDo not despair of the mercy of Allah. (39:53)"
         ],
-        // --- 10 PROTECTION DU'AS ---
         EvilEye: [
             "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ وَمِن كُلِّ عَيْنٍ لَّامَّةٍ\nA‘ūdhu bi-kalimātillāhit-tāmmah min kulli shayṭānin wa hāmmah wa min kulli ‘aynin lāmmah\nI seek refuge in the perfect words of Allah from every devil, poisonous creature, and every evil eye."
         ],
@@ -228,13 +240,13 @@
             "بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا\nBismillāhi walajnā wa bismillāhi kharajnā\nIn the name of Allah we enter, and in the name of Allah we leave."
         ],
         DebtFreedom: [
-            "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ\nAllāhumma-kfinī biḥalālika ‘an ḥarāmika\nO Allah, suffice me with what is lawful instead of what is forbidden."
+            "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ\nAllāhumma-kfinī biḥالālika ‘an ḥarāmika\nO Allah, suffice me with what is lawful instead of what is forbidden."
         ],
         UnexpectedTrial: [
             "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ\nBismillāh illadhī lā yaḍurru ma‘as-mihi shay’un fil-arḍi wa lā fis-samā’\nIn the name of Allah, with whose name nothing on earth or in heaven can cause harm."
         ],
         AngerControl: [
-            "اللَّهُمَّ اغْفِرْ لِي ذَنْبِي وَأَذْهِبْ غَيْظَ قَلْبِي\nAllāhumma-ghfir lī dhanbī wa adh-hib ghayẓa qalbī\nO Allah, forgive my sin and remove the anger of my heart."
+            "اللَّهُمَّ اغْفِرْ لِي ذَنْبِي وَأَذْهِبْ غَيْظَ قَلْبِي\nAllāhumma-غfir lī dhanbī wa adh-hib ghayẓa qalbī\nO Allah, forgive my sin and remove the anger of my heart."
         ],
         ChildrensProtection: [
             "أُعِيذُكُمَا بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ\nU‘īdhukumā bi-kalimātillāhit-tāmmah min kulli shayṭānin wa hāmmah\nI seek protection for you both with the perfect words of Allah from every devil and poisonous creature."
@@ -263,7 +275,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'invocation-app-pro';
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'invocation-pro';
 
     const haptic = (style = 'light') => {
         if (navigator.vibrate) navigator.vibrate(style === 'heavy' ? 30 : 10);
@@ -273,7 +285,7 @@
         const t = document.getElementById('toast');
         t.innerText = msg;
         t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2500);
+        setTimeout(() => t.classList.remove('show'), 2000);
     };
 
     const toggleLoading = (show) => {
@@ -285,23 +297,22 @@
         document.getElementById('settingsPanel').classList.remove('active');
         
         const screens = document.querySelectorAll('.screen');
-        for (let s of screens) {
-            if (s.id === screenId) {
-                s.classList.add('active');
-                s.scrollTop = 0;
-            } else {
-                s.classList.remove('active');
-            }
+        screens.forEach(s => s.classList.remove('active'));
+        
+        const target = document.getElementById(screenId);
+        if (target) {
+            target.classList.add('active');
+            target.scrollTop = 0;
         }
         
         currentScreen = screenId;
         if (screenId === 'favScreen') renderFavs();
         
-        if (screenId !== 'welcomeScreen') {
-            const header = document.getElementById('appHeader');
-            header.style.opacity = '1';
-            header.style.pointerEvents = 'auto';
-            header.style.zIndex = '2005';
+        const header = document.getElementById('appHeader');
+        if (screenId === 'welcomeScreen') {
+            header.classList.remove('visible');
+        } else {
+            header.classList.add('visible');
         }
     };
 
@@ -364,7 +375,7 @@
         try {
             const ref = doc(collection(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'favourites'));
             await setDoc(ref, { text: currentVerseRaw, mood: currentMood, timestamp: Date.now() });
-            showToast("Saved to Favourites ⭐");
+            showToast("Saved ⭐");
         } catch (e) { showToast("Error saving"); }
         toggleLoading(false);
     };
@@ -381,8 +392,8 @@
             return `
                 <div class="list-item">
                     <div class="arabic" style="font-size:24px;">${parts[0]}</div>
-                    <div class="translation" style="font-size:14px; opacity:0.7;">${parts[2]}</div>
-                    <button style="background:none; border:none; color:#ff6b6b; font-size:10px; margin-top:15px; cursor:pointer; letter-spacing:1px;" onclick="deleteFav(event, '${f.id}')">REMOVE</button>
+                    <div class="translation" style="font-size:14px; opacity:0.7; margin-top:10px;">${parts[2]}</div>
+                    <button style="background:none; border:none; color:#ff6b6b; font-size:10px; margin-top:20px; cursor:pointer; letter-spacing:2px; font-weight:600;" onclick="deleteFav(event, '${f.id}')">REMOVE</button>
                 </div>
             `;
         }).join('');
@@ -403,22 +414,24 @@
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
-        showToast("Copied to clipboard 📋");
+        showToast("Copied 📋");
     };
 
     window.snap = () => {
+        toggleLoading(true);
         const area = document.getElementById('shareArea');
         const oldBg = area.style.background;
         area.style.background = getComputedStyle(document.body).backgroundImage;
         
-        html2canvas(area, { backgroundColor: null }).then(canvas => {
+        html2canvas(area, { backgroundColor: null, scale: 2 }).then(canvas => {
             const link = document.createElement('a');
             link.download = `Invocation-${currentMood}.png`;
             link.href = canvas.toDataURL();
             link.click();
             area.style.background = oldBg;
             showToast("Captured 📸");
-        });
+            toggleLoading(false);
+        }).catch(() => toggleLoading(false));
     };
 
     window.setTheme = (t) => {
@@ -433,7 +446,6 @@
             await signInAnonymously(auth);
         }
         
-        // Render the 10 Protection items once
         const pList = document.getElementById('protectList');
         pList.innerHTML = protectionLibrary.map(p => `
             <div class="list-item" onclick="openState('${p.id}')">
