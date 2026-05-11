@@ -6,25 +6,18 @@
     <title>Invocation | Spiritual Du'as</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
     
     <style>
         :root {
+            --app-height: 100vh;
             --bg: linear-gradient(135deg, #09203f 0%, #537895 100%);
             --text: #ffffff;
             --accent: #00d2ff;
             --btn-bg: rgba(255, 255, 255, 0.12);
             --card-bg: rgba(255, 255, 255, 0.08);
-            /* Fallbacks for GitHub Pages safe areas */
-            --sat: 20px; 
-            --sab: 20px;
-        }
-
-        @supports (padding: env(safe-area-inset-top)) {
-            :root {
-                --sat: env(safe-area-inset-top);
-                --sab: env(safe-area-inset-bottom);
-            }
+            --sat: env(safe-area-inset-top, 0px);
+            --sab: env(safe-area-inset-bottom, 0px);
         }
 
         body.deepsea { --bg: linear-gradient(135deg, #09203f 0%, #537895 100%); --text: #ffffff; --accent: #00d2ff; }
@@ -35,11 +28,12 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         
-        html, body {
-            height: 100%;
+        body, html {
+            height: var(--app-height);
             width: 100%;
             overflow: hidden;
-            background: #09203f; /* Hard fallback */
+            position: fixed; 
+            background: #09203f;
         }
 
         body { 
@@ -47,21 +41,19 @@
             color: var(--text); 
             background: var(--bg);
             transition: background 0.6s ease; 
-            user-select: none;
             display: flex;
             flex-direction: column;
         }
 
         header {
-            position: fixed; top: 0; left: 0; right: 0;
+            position: absolute; top: 0; left: 0; right: 0;
             padding: calc(20px + var(--sat)) 25px 15px; 
             display: flex; justify-content: space-between; align-items: center; 
             z-index: 2000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
+            opacity: 0; visibility: hidden;
+            transition: 0.5s ease;
         }
-        header.visible { opacity: 1; pointer-events: auto; }
+        header.visible { opacity: 1; visibility: visible; }
 
         .brand { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; opacity: 0.6; cursor: pointer; }
         .settings-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: inherit; padding: 8px; }
@@ -70,37 +62,23 @@
             position: absolute; right: 25px; top: calc(75px + var(--sat)); 
             background: var(--btn-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             padding: 20px; border-radius: 24px; width: 240px; border: 1px solid rgba(255, 255, 255, 0.1); 
-            z-index: 2100; opacity: 0; pointer-events: none; transform: translateY(-10px); transition: 0.3s ease;
+            z-index: 2100; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: 0.3s ease;
         }
-        .panel.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .panel.active { opacity: 1; visibility: visible; transform: translateY(0); }
         .panel-btn { width: 100%; padding: 12px; margin-bottom: 6px; border-radius: 12px; font-size: 13px; text-align: left; background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
 
         .screen { 
             position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease, transform 0.4s ease; 
-            transform: translate3d(0, 20px, 0);
+            opacity: 0; visibility: hidden; transition: opacity 0.4s ease, transform 0.4s ease; 
+            transform: scale(0.98);
             padding: 20px; padding-top: calc(80px + var(--sat)); padding-bottom: calc(20px + var(--sab));
             z-index: 500;
-            background: var(--bg);
         }
-        .screen.active { opacity: 1; pointer-events: auto; transform: translate3d(0, 0, 0); }
-        .screen-scroll { overflow-y: auto; display: block; -webkit-overflow-scrolling: touch; }
+        .screen.active { opacity: 1; visibility: visible; transform: scale(1); }
+        .screen-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; display: block; }
 
-        #welcomeScreen { 
-            z-index: 5000; 
-            cursor: pointer; 
-            opacity: 1; 
-            pointer-events: auto; 
-            transform: none; 
-            padding-top: 0; 
-        }
-        #welcomeScreen.fade-out {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(1.05);
-        }
-
-        .welcome-title { font-weight: 300; letter-spacing: 12px; text-transform: uppercase; font-size: 2rem; margin-bottom: 20px; }
+        #welcomeScreen { z-index: 3000; padding-top: 0; cursor: pointer; }
+        .welcome-title { font-weight: 300; letter-spacing: 12px; text-transform: uppercase; font-size: 2rem; margin-bottom: 20px; text-align: center; }
         .welcome-subtitle { font-style: italic; opacity: 0.6; line-height: 1.8; font-size: 15px; text-align: center; max-width: 280px; }
 
         .mood-container { width: 100%; overflow-x: auto; display: flex; scroll-snap-type: x mandatory; padding: 40px 0; scrollbar-width: none; }
@@ -110,49 +88,48 @@
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 40px; 
             scroll-snap-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; cursor: pointer; transition: transform 0.2s;
+            text-align: center; cursor: pointer;
         }
-        .mood-card:active { transform: scale(0.96); }
         .mood-card h3 { font-size: 26px; font-weight: 300; margin-bottom: 10px; }
         .mood-card p { font-size: 12px; opacity: 0.5; font-style: italic; padding: 0 30px; }
 
         .back-nav { background: none; border: none; color: var(--accent); margin-bottom: 20px; letter-spacing: 3px; font-size: 10px; cursor: pointer; text-transform: uppercase; font-weight: 600; padding: 10px; }
 
-        .arabic { font-family: 'Amiri', serif; font-size: 32px; line-height: 2; margin-bottom: 15px; direction: rtl; text-align: center; }
-        .translit { font-size: 14px; opacity: 0.6; font-style: italic; margin-bottom: 10px; text-align: center; line-height: 1.5; padding: 0 10px; }
-        .translation { font-size: 17px; line-height: 1.6; text-align: center; padding: 0 10px; }
+        .arabic { font-family: 'Amiri', serif; font-size: clamp(24px, 6vw, 32px); line-height: 2; margin-bottom: 15px; direction: rtl; text-align: center; }
+        .translit { font-size: 14px; opacity: 0.6; font-style: italic; margin-bottom: 10px; text-align: center; line-height: 1.5; }
+        .translation { font-size: 17px; line-height: 1.6; text-align: center; }
 
         .btn-stack { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
-        .main-btn { padding: 20px; border-radius: 24px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 12px; background: var(--btn-bg); color: inherit; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
-        .sub-btn-row { display: flex; gap: 10px; }
-        .icon-btn { flex: 1; padding: 15px; border-radius: 18px; font-size: 10px; text-transform: uppercase; background: var(--btn-bg); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .main-btn { padding: 18px; border-radius: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; background: var(--btn-bg); color: inherit; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
+        .sub-btn-row { display: flex; gap: 8px; }
+        .icon-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 10px; text-transform: uppercase; background: var(--btn-bg); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
 
-        .list-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 500px; margin: 0 auto; padding-bottom: 40px; }
-        .list-item { padding: 25px; border-radius: 24px; background: var(--btn-bg); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; text-align: center; transition: all 0.2s; }
+        .list-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 500px; padding-bottom: 40px; }
+        .list-item { padding: 25px; border-radius: 24px; background: var(--btn-bg); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; text-align: center; }
 
         .toast {
             position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 30px;
-            font-size: 12px; transition: 0.4s; opacity: 0; z-index: 6000; pointer-events: none;
+            background: rgba(0,0,0,0.85); color: white; padding: 12px 24px; border-radius: 30px;
+            font-size: 11px; transition: 0.4s; opacity: 0; z-index: 9000; pointer-events: none;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        #loading { position: fixed; inset: 0; background: #09203f; z-index: 7000; display: none; align-items: center; justify-content: center; }
-        .loader { width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        #loader { position: fixed; inset: 0; background: #09203f; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: 0.5s; pointer-events: none; }
+        .spinner { width: 30px; height: 30px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="deepsea">
 
-<div id="loading"><div class="loader"></div></div>
+<div id="loader"><div class="spinner"></div></div>
 
 <header id="appHeader">
     <div class="brand" onclick="navigate('moodScreen')">Invocation</div>
     <button class="settings-btn" onclick="togglePanel(event)">⚙️</button>
     <div id="settingsPanel" class="panel">
         <button class="panel-btn" onclick="navigate('favScreen')">⭐ Favourites</button>
-        <button class="panel-btn" onclick="navigate('protectScreen')">Protection & Safety</button>
-        <div style="font-size: 9px; opacity: 0.4; letter-spacing: 2px; margin: 10px 5px 5px;">THEMES</div>
+        <button class="panel-btn" onclick="navigate('protectScreen')">🛡️ Protection</button>
+        <div style="font-size: 9px; opacity: 0.4; letter-spacing: 2px; margin: 15px 5px 5px;">THEMES</div>
         <button class="panel-btn" onclick="setTheme('deepsea')">Deep Sea</button>
         <button class="panel-btn" onclick="setTheme('mist')">Mist</button>
         <button class="panel-btn" onclick="setTheme('midnight')">Midnight</button>
@@ -160,30 +137,29 @@
     </div>
 </header>
 
-<!-- Screens -->
-<div id="welcomeScreen" class="screen" onclick="enterApp()">
+<div id="welcomeScreen" class="screen active" onclick="enterApp()">
     <h1 class="welcome-title">Invocation</h1>
-    <p class="welcome-subtitle">Whispered du’as for every state of the heart</p>
-    <p style="font-size: 9px; margin-top: 40px; letter-spacing: 2px; opacity: 0.5;">TAP TO BEGIN</p>
+    <p class="welcome-subtitle">Healing du’as for the restless heart</p>
+    <p style="font-size: 9px; margin-top: 50px; letter-spacing: 3px; opacity: 0.5;">TAP TO START</p>
 </div>
 
 <div id="moodScreen" class="screen">
     <h2 style="font-weight: 300; margin-bottom: 20px; opacity: 0.8;">How is your heart?</h2>
     <div class="mood-container">
         <div style="flex: 0 0 10vw;"></div>
-        <div class="mood-card" onclick="openState('Anxious')"><h3>Anxious</h3><p>For when the world feels too loud.</p></div>
-        <div class="mood-card" onclick="openState('Depressed')"><h3>Depressed</h3><p>For when the light feels distant.</p></div>
-        <div class="mood-card" onclick="openState('Lonely')"><h3>Lonely</h3><p>Reminding you He is always near.</p></div>
-        <div class="mood-card" onclick="openState('Overwhelmed')"><h3>Overwhelmed</h3><p>Seeking ease within the burden.</p></div>
+        <div class="mood-card" onclick="openState('Anxious')"><h3>Anxious</h3><p>When the world feels too loud.</p></div>
+        <div class="mood-card" onclick="openState('Depressed')"><h3>Depressed</h3><p>When the light feels distant.</p></div>
+        <div class="mood-card" onclick="openState('Lonely')"><h3>Lonely</h3><p>Reminding you He is near.</p></div>
+        <div class="mood-card" onclick="openState('Overwhelmed')"><h3>Overwhelmed</h3><p>Seeking ease in the burden.</p></div>
         <div class="mood-card" onclick="openState('Ashamed')"><h3>Ashamed</h3><p>Returning to Infinite Mercy.</p></div>
         <div style="flex: 0 0 10vw;"></div>
     </div>
 </div>
 
 <div id="protectScreen" class="screen screen-scroll">
-    <div style="max-width: 500px; width: 100%; margin: 0 auto; padding: 20px 0;">
+    <div style="max-width: 500px; width: 100%; margin: 0 auto; padding: 20px;">
         <button class="back-nav" onclick="navigate('moodScreen')">← Back</button>
-        <h2 style="font-weight: 300; margin-bottom: 30px; text-align: center;">Protection & Safety</h2>
+        <h2 style="font-weight: 300; margin-bottom: 30px; text-align: center;">Shield & Safety</h2>
         <div id="protectList" class="list-stack"></div>
     </div>
 </div>
@@ -204,7 +180,7 @@
 </div>
 
 <div id="favScreen" class="screen screen-scroll">
-    <div style="max-width: 500px; width: 100%; margin: 0 auto; padding: 20px 0;">
+    <div style="max-width: 500px; width: 100%; margin: 0 auto; padding: 20px;">
         <button class="back-nav" onclick="navigate('moodScreen')">← Back</button>
         <h2 style="font-weight: 300; margin-bottom: 30px; text-align: center;">Favourites</h2>
         <div id="favList" class="list-stack"></div>
@@ -213,233 +189,179 @@
 
 <div id="toast" class="toast"></div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    // Library
+<script>
     const dbData = {
-        Anxious: ["اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.", "حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ\nḤasbiyallāhu lā ilāha illā Huwa ‘alayhi tawakkaltu\nAllah is sufficient for me; there is no deity except Him. In Him I trust."],
-        Depressed: ["لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\nLā ilāha illā anta subḥānaka innī kuntu min al-ẓālimīn\nThere is no deity except You; glory be to You. Indeed, I have been of the wrongdoers."],
+        Anxious: ["اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.", "حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ\nḤasbiyallāhu lā ilāha illā Huwa ‘alayhi tawakkaltu\nAllah is sufficient for me; there is no deity except Him."],
+        Depressed: ["لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\nLā ilāha illā anta subḥānaka innī kuntu min al-ẓālimīn\nThere is no deity except You; glory be to You. I have been of the wrongdoers."],
         Lonely: ["اللَّهُمَّ آنِسْ وَحْشَتِي\nAllāhumma ānis waḥshatī\nO Allah, comfort my loneliness."],
         Overwhelmed: ["رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي\nRabbi-shraḥ lī ṣadrī wa yassir lī amrī\nMy Lord, expand for me my chest and ease for me my task."],
         Ashamed: ["لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ\nLā taqnaṭū min raḥmatillāh\nDo not despair of the mercy of Allah."],
-        EvilEye: ["أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ وَمِن كُلِّ عَيْنٍ لَّامَّةٍ\nA‘ūdhu bi-kalimātillāhit-tāmmah min kulli shayṭānin wa hāmmah wa min kulli ‘aynin lāmmah\nI seek refuge in the perfect words of Allah from every devil and every evil eye."],
+        EvilEye: ["أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ\nA‘ūdhu bi-kalimātillāhit-tāmmah min kulli shayṭān\nI seek refuge in the perfect words of Allah from every devil."],
         Healing: ["اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَاسَ اشْفِ أَنْتَ الشَّافِي\nAllāhumma rabban-nāsi adhhibil-ba’sash-fi antash-shāfī\nO Allah, Lord of mankind, remove the harm and heal."],
-        SpiritualAttacks: ["أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ\nA‘ūdhu billāhi minash-shayṭānir-rajīm\nI seek refuge in Allah from the accursed devil."],
-        NightTerrors: ["أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِن غَضَبِهِ وَعِقَابِهِ\nA‘ūdhu bikalimātillāhit-tāmmāti min ghaḍabihi wa ‘iqābihi\nI seek refuge in the perfect words of Allah from His anger and punishment."],
-        TravelSafety: ["اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى\nAllāhumma innā nas’aluka fī safarinā hādhā al-birra wat-taqwā\nO Allah, we ask You for righteousness and piety on this journey."],
-        DomesticPeace: ["بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا\nBismillāhi walajnā wa bismillāhi kharajnā\nIn the name of Allah we enter, and in the name of Allah we leave."],
-        DebtFreedom: ["اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ\nAllāhumma-kfinī biḥālika ‘an ḥarāmika\nO Allah, suffice me with what is lawful instead of what is forbidden."],
-        UnexpectedTrial: ["بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ\nBismillāh illadhī lā yaḍurru ma‘as-mihi shay’un\nIn the name of Allah, with whose name nothing on earth or in heaven can cause harm."],
-        AngerControl: ["اللَّهُمَّ اغْفِرْ لِي ذَنْبِي وَأَذْهِبْ غَيْظَ قَلْبِي\nAllāhumma-ghfir lī dhanbī wa adh-hib ghayẓa qalbī\nO Allah, forgive my sin and remove the anger of my heart."],
-        ChildrensProtection: ["أُعِيذُكُمَا بِكَلِمَاتِ اللَّهِ التَّامَّةِ\nU‘īdhukumā bi-kalimātillāhit-tāmmah\nI seek protection for you both with the perfect words of Allah."]
+        SpiritualAttacks: ["أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ\nA‘ūdhu billāhi minash-shayṭānir-rajīm\nI seek refuge in Allah from the accursed devil."]
     };
 
     const protectionLibrary = [
-        { id: 'EvilEye', name: 'The Evil Eye', desc: 'Protection from jealousy and harmful gazes.' },
-        { id: 'Healing', name: 'Healing', desc: 'Restoration for the body and spirit.' },
-        { id: 'SpiritualAttacks', name: 'Spiritual Attacks', desc: 'Refuge from whispers and unseen harm.' },
-        { id: 'NightTerrors', name: 'Night Terrors', desc: 'Peaceful sleep and safety from bad dreams.' },
-        { id: 'TravelSafety', name: 'Safe Travel', desc: 'Guardianship during journeys.' },
-        { id: 'DomesticPeace', name: 'Domestic Peace', desc: 'Blessing your home and those within it.' },
-        { id: 'DebtFreedom', name: 'Debt & Hardship', desc: 'Seeking sufficiency and freedom from lack.' },
-        { id: 'UnexpectedTrial', name: 'Sudden Calamity', desc: 'Shielding from unexpected trials.' },
-        { id: 'AngerControl', name: 'Inner Calm', desc: 'Protecting the heart from consuming rage.' },
-        { id: 'ChildrensProtection', name: 'For Children', desc: 'Seeking protection for the little ones.' }
+        { id: 'EvilEye', name: 'Evil Eye', desc: 'Protection from jealousy.' },
+        { id: 'Healing', name: 'Healing', desc: 'For body and spirit.' },
+        { id: 'SpiritualAttacks', name: 'Spiritual Shield', desc: 'Protection from unseen harm.' }
     ];
 
-    let currentMood = '';
-    let favorites = [];
-    let currentVerseRaw = '';
-    let db, auth;
+    let state = {
+        currentMood: '',
+        currentVerse: ''
+    };
+
+    const setVh = () => {
+        document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    };
+    window.addEventListener('resize', setVh);
+    setVh();
 
     const showToast = (msg) => {
         const t = document.getElementById('toast');
         t.innerText = msg;
         t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2000);
+        setTimeout(() => t.classList.remove('show'), 2500);
     };
 
-    const toggleLoading = (show) => {
-        document.getElementById('loading').style.display = show ? 'flex' : 'none';
-    };
-
-    window.navigate = (screenId) => {
+    const navigate = (screenId) => {
         document.getElementById('settingsPanel').classList.remove('active');
-        const screens = document.querySelectorAll('.screen');
-        screens.forEach(s => s.classList.remove('active'));
-        
-        const target = document.getElementById(screenId);
-        if (target) target.classList.add('active');
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
         
         const header = document.getElementById('appHeader');
-        if (screenId === 'welcomeScreen') {
-            header.classList.remove('visible');
-        } else {
-            header.classList.add('visible');
-        }
+        if (screenId === 'welcomeScreen') header.classList.remove('visible');
+        else header.classList.add('visible');
 
         if (screenId === 'favScreen') renderFavs();
     };
 
-    window.enterApp = () => {
-        const welcome = document.getElementById('welcomeScreen');
-        welcome.classList.add('fade-out');
-        setTimeout(() => {
-            navigate('moodScreen');
-            welcome.style.display = 'none';
-        }, 600);
-    };
+    const enterApp = () => navigate('moodScreen');
 
-    window.togglePanel = (e) => {
+    const togglePanel = (e) => {
         e.stopPropagation();
         document.getElementById('settingsPanel').classList.toggle('active');
     };
 
-    window.openState = (mood) => {
-        currentMood = mood;
+    const openState = (mood) => {
+        state.currentMood = mood;
         const isProtection = protectionLibrary.some(p => p.id === mood);
-        const backBtn = document.getElementById('verseBack');
-        backBtn.onclick = () => navigate(isProtection ? 'protectScreen' : 'moodScreen');
-        
-        const pool = dbData[currentMood] || [];
-        document.getElementById('nextBtn').style.display = pool.length > 1 ? 'block' : 'none';
-        
+        document.getElementById('verseBack').onclick = () => navigate(isProtection ? 'protectScreen' : 'moodScreen');
+        document.getElementById('nextBtn').style.display = (dbData[mood] || []).length > 1 ? 'block' : 'none';
         navigate('verseScreen');
         nextVerse();
     };
 
-    window.nextVerse = () => {
-        const pool = dbData[currentMood];
+    const nextVerse = () => {
+        const pool = dbData[state.currentMood];
         if (!pool) return;
-        const verse = pool[Math.floor(Math.random() * pool.length)];
-        currentVerseRaw = verse;
-        
-        const content = document.getElementById('verseContent');
-        const [arabic, translit, translation] = verse.split('\n');
-        content.innerHTML = `
-            <div class="arabic">${arabic}</div>
-            <div class="translit">${translit}</div>
-            <div class="translation">${translation}</div>
+        state.currentVerse = pool[Math.floor(Math.random() * pool.length)];
+        const [ar, tr, en] = state.currentVerse.split('\n');
+        document.getElementById('verseContent').innerHTML = `
+            <div class="arabic">${ar}</div>
+            <div class="translit">${tr}</div>
+            <div class="translation">${en}</div>
         `;
     };
 
-    window.saveFav = async () => {
-        if (!auth || !auth.currentUser) return showToast("Offline Mode");
-        if (favorites.some(f => f.text === currentVerseRaw)) return showToast("Already saved");
+    const saveFav = () => {
+        let favs = JSON.parse(localStorage.getItem('invocation_favs') || '[]');
+        if (favs.some(v => v.text === state.currentVerse)) return showToast("Already saved");
         
-        toggleLoading(true);
-        try {
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'invocation-prod';
-            const ref = doc(collection(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'favourites'));
-            await setDoc(ref, { text: currentVerseRaw, mood: currentMood, timestamp: Date.now() });
-            showToast("Saved ⭐");
-        } catch (e) { showToast("Sync Error"); }
-        toggleLoading(false);
+        favs.push({ 
+            id: Date.now().toString(), 
+            text: state.currentVerse, 
+            mood: state.currentMood 
+        });
+        localStorage.setItem('invocation_favs', JSON.stringify(favs));
+        showToast("Saved to Favourites ⭐");
     };
 
-    window.renderFavs = () => {
+    const renderFavs = () => {
         const list = document.getElementById('favList');
-        if (!favorites.length) {
-            list.innerHTML = "<p style='opacity:0.4; text-align:center; padding: 40px;'>No saved items yet.</p>";
+        const items = JSON.parse(localStorage.getItem('invocation_favs') || '[]');
+        
+        if (!items.length) {
+            list.innerHTML = "<p style='opacity:0.4; text-align:center; padding: 40px;'>No saved du'as yet.</p>";
             return;
         }
-        list.innerHTML = favorites.map(f => {
-            const parts = f.text.split('\n');
+
+        list.innerHTML = items.map(f => {
+            const p = f.text.split('\n');
             return `
                 <div class="list-item">
-                    <div class="arabic" style="font-size:24px;">${parts[0]}</div>
-                    <div class="translation" style="font-size:14px; opacity:0.7;">${parts[2]}</div>
-                    <button style="background:none; border:none; color:#ff6b6b; font-size:10px; margin-top:15px; cursor:pointer;" onclick="deleteFav(event, '${f.id}')">REMOVE</button>
+                    <div class="arabic" style="font-size:22px;">${p[0]}</div>
+                    <div class="translation" style="font-size:13px; margin-top:10px;">${p[2]}</div>
+                    <button style="background:none; border:none; color:#ff6b6b; font-size:10px; margin-top:15px; cursor:pointer;" onclick="deleteFav('${f.id}')">REMOVE</button>
                 </div>
             `;
         }).join('');
     };
 
-    window.deleteFav = async (e, id) => {
-        e.stopPropagation();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'invocation-prod';
-        try {
-            await deleteDoc(doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'favourites', id));
-        } catch(e) { showToast("Error deleting"); }
+    const deleteFav = (id) => {
+        let favs = JSON.parse(localStorage.getItem('invocation_favs') || '[]');
+        favs = favs.filter(f => f.id !== id);
+        localStorage.setItem('invocation_favs', JSON.stringify(favs));
+        renderFavs();
     };
 
-    window.copyVerse = () => {
+    const copyVerse = () => {
         const el = document.createElement('textarea');
-        el.value = currentVerseRaw;
+        el.value = state.currentVerse;
         document.body.appendChild(el);
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
-        showToast("Copied 📋");
+        showToast("Copied to Clipboard 📋");
     };
 
-    window.snap = () => {
-        toggleLoading(true);
-        const area = document.getElementById('shareArea');
-        html2canvas(area, { backgroundColor: null, scale: 2 }).then(canvas => {
+    const snap = () => {
+        const loader = document.getElementById('loader');
+        loader.style.display = 'flex';
+        loader.style.opacity = '0.7';
+        
+        html2canvas(document.getElementById('shareArea'), { 
+            backgroundColor: null, 
+            scale: 2,
+            useCORS: true 
+        }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `Invocation.png`;
+            link.download = `Invocation-${Date.now()}.png`;
             link.href = canvas.toDataURL();
             link.click();
-            showToast("Captured 📸");
-            toggleLoading(false);
-        }).catch(() => toggleLoading(false));
+            loader.style.display = 'none';
+            showToast("Image Saved 📸");
+        }).catch(err => {
+            loader.style.display = 'none';
+            showToast("Capture Failed");
+        });
     };
 
-    window.setTheme = (t) => {
+    const setTheme = (t) => {
         document.body.className = t;
         document.getElementById('settingsPanel').classList.remove('active');
     };
 
-    // Bootstrap
-    const init = async () => {
-        // Safe check for Firebase config
-        let config = {};
-        try {
-            config = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        } catch(e) { console.warn("Missing Firebase Config"); }
-
-        if (config.apiKey) {
-            const app = initializeApp(config);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'invocation-prod';
-
-            const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-            if (token) await signInWithCustomToken(auth, token);
-            else await signInAnonymously(auth);
-
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    onSnapshot(collection(db, 'artifacts', appId, 'users', user.uid, 'favourites'), (snap) => {
-                        favorites = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                        if (document.getElementById('favScreen').classList.contains('active')) renderFavs();
-                    });
-                }
-            });
-        }
-
-        // Render protection list
+    window.onload = () => {
         document.getElementById('protectList').innerHTML = protectionLibrary.map(p => `
             <div class="list-item" onclick="openState('${p.id}')">
                 <div style="font-weight:600; font-size:12px; color:var(--accent); margin-bottom:4px;">${p.name.toUpperCase()}</div>
                 <div style="font-size:11px; opacity:0.6;">${p.desc}</div>
             </div>
         `).join('');
+
+        const l = document.getElementById('loader');
+        l.style.opacity = '0';
+        setTimeout(() => l.style.display = 'none', 500);
     };
 
     document.addEventListener('click', (e) => {
-        const panel = document.getElementById('settingsPanel');
-        if (panel.classList.contains('active') && !panel.contains(e.target) && !e.target.closest('.settings-btn')) {
-            panel.classList.remove('active');
+        const p = document.getElementById('settingsPanel');
+        if (p.classList.contains('active') && !p.contains(e.target) && !e.target.closest('.settings-btn')) {
+            p.classList.remove('active');
         }
     });
-
-    // Start
-    window.onload = init;
 </script>
 </body>
 </html>
