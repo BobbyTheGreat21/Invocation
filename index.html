@@ -2,24 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport updated for native mobile edge-to-edge support -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     
-    <!-- PWA & Mobile Native Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#09203f">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2309203f'/><text x='50%' y='50%' font-size='40' font-family='sans-serif' fill='white' text-anchor='middle' dy='.3em'>I</text></svg>">
     
     <title>Invocation</title>
     
-    <!-- External Resources -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <!-- Capacitor Core & Plugins (CDN for Single File Prototype) -->
-    <script src="https://unpkg.com/@capacitor/core@5.0.0/dist/capacitor.global.js"></script>
-    <script src="https://unpkg.com/@capacitor/haptics@5.0.0/dist/plugin.js"></script>
     
     <style>
         :root {
@@ -29,16 +21,18 @@
             --btn-bg: rgba(255, 255, 255, 0.12);
             --card-bg: rgba(255, 255, 255, 0.08);
             --transition-speed: 0.6s;
-            /* Safe area for native mobile notches */
             --sat: env(safe-area-inset-top);
             --sab: env(safe-area-inset-bottom);
         }
 
         /* --- THEMES --- */
+        body.deepsea { --bg: linear-gradient(135deg, #09203f 0%, #537895 100%); --text: #ffffff; --accent: #00d2ff; }
         body.mist { --bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); --text: #1f2937; --accent: #2563eb; --btn-bg: rgba(0, 0, 0, 0.06); --card-bg: rgba(0, 0, 0, 0.04); }
         body.midnight { --bg: linear-gradient(135deg, #0f1115 0%, #1a1d23 100%); --text: #e6e6e6; --accent: #6ee7ff; --btn-bg: rgba(255, 255, 255, 0.06); --card-bg: rgba(255, 255, 255, 0.04); }
         body.olive { --bg: linear-gradient(135deg, #ebebe0 0%, #a3ad91 100%); --text: #2f3e30; --accent: #4a5d4b; --btn-bg: rgba(0, 0, 0, 0.06); --card-bg: rgba(0, 0, 0, 0.04); }
         body.golden { --bg: linear-gradient(135deg, #fff1eb 0%, #ffdf91 100%); --text: #4a3728; --accent: #b3932d; --btn-bg: rgba(255, 255, 255, 0.15); --card-bg: rgba(255, 255, 255, 0.1); }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body { 
             margin: 0; padding: 0; font-family: 'Inter', sans-serif; 
@@ -46,61 +40,55 @@
             color: var(--text); height: 100vh; width: 100vw;
             display: flex; flex-direction: column;
             overflow: hidden; transition: background var(--transition-speed) ease; 
-            -webkit-tap-highlight-color: transparent;
-            user-select: none; /* Native app feel */
+            user-select: none;
         }
 
-        /* --- HEADER & SETTINGS --- */
         header {
             position: fixed; top: 0; left: 0; right: 0;
             padding: calc(25px + var(--sat, 0px)) 30px 25px 30px; 
             display: flex; justify-content: space-between; align-items: center;
             z-index: 2005;
         }
-        .brand-link {
-            font-size: 12px; letter-spacing: 5px; text-transform: uppercase; font-weight: 600;
-            opacity: 0.8; cursor: pointer;
-        }
-        .settings-trigger {
-            background: none; border: none; font-size: 1.4rem;
-            opacity: 0.8; cursor: pointer; padding: 5px; transition: opacity 0.3s;
-        }
-        
-        button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+        .brand-link { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; opacity: 0.6; cursor: pointer; }
+        .settings-trigger { background: none; border: none; font-size: 1.4rem; opacity: 0.9; cursor: pointer; padding: 5px; transition: opacity 0.3s, transform 0.3s; }
+        .settings-trigger:active { transform: rotate(45deg); opacity: 1; }
 
         .panel { 
             position: absolute; right: 30px; top: calc(75px + var(--sat, 0px)); 
             background: var(--btn-bg); backdrop-filter: blur(40px);
             -webkit-backdrop-filter: blur(40px); padding: 25px; border-radius: 28px; 
-            width: 240px; border: 1px solid rgba(255, 255, 255, 0.1); z-index: 2100;
+            width: 260px; border: 1px solid rgba(255, 255, 255, 0.1); z-index: 2100;
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             opacity: 0; pointer-events: none; transform: translateY(-10px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: 0.3s ease;
+            max-height: 80vh; overflow-y: auto;
         }
         .panel.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        .panel-btn { width: 100%; padding: 15px; font-weight: 600; margin-bottom: 15px; }
-        .theme-header { font-size: 10px; opacity: 0.4; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
-        .theme-list { display: grid; gap: 8px; }
-        .theme-list button { padding: 10px; }
-
-        /* --- SCREENS --- */
+        .panel-btn { width: 100%; padding: 15px; font-weight: 600; margin-bottom: 12px; border-radius: 18px; font-size: 13px; text-align: left; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .panel-header { font-size: 9px; opacity: 0.4; text-transform: uppercase; letter-spacing: 2px; margin: 15px 0 10px 5px; }
+        
         .screen { 
             position: absolute; inset: 0; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; 
-            transition: opacity 0.5s ease, transform 0.5s ease; padding: 20px;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px;
             padding-bottom: calc(20px + var(--sab, 0px));
+            overflow-x: hidden;
         }
         .hidden { opacity: 0 !important; pointer-events: none; transform: translateY(15px); }
-        .back-btn { background: none; border: none; color: var(--accent); margin-bottom: 20px; letter-spacing: 2px; font-size: 11px; }
+        .back-btn { background: none; border: none; color: var(--accent); margin-bottom: 30px; letter-spacing: 3px; font-size: 10px; cursor: pointer; font-weight: 600; text-transform: uppercase; }
 
-        /* Welcome Screen Typography */
+        .scrollable-screen {
+            justify-content: flex-start;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-top: calc(100px + var(--sat, 0px));
+            padding-bottom: calc(80px + var(--sab, 0px));
+        }
+
         #welcomeScreen { z-index: 3000; background: var(--bg); text-align: center; cursor: pointer; }
-        .welcome-title { font-weight: 300; letter-spacing: 14px; text-transform: uppercase; font-size: 2.2rem; margin-bottom: 20px; }
-        .welcome-subtitle { font-style: italic; opacity: 0.7; font-weight: 300; max-width: 280px; line-height: 2; margin: 0 auto; }
-        .enter-hint { position: absolute; bottom: calc(60px + var(--sab, 0px)); font-size: 9px; letter-spacing: 5px; opacity: 0.4; width: 100%; left: 0; text-align: center; }
-        .screen-title { font-weight: 300; margin-bottom: 10px; opacity: 0.9; }
+        .welcome-title { font-weight: 300; letter-spacing: 16px; text-transform: uppercase; font-size: 2.4rem; margin-bottom: 20px; }
+        .welcome-subtitle { font-style: italic; opacity: 0.6; font-weight: 300; max-width: 280px; line-height: 2; margin: 0 auto; font-size: 15px; }
 
-        /* --- CAROUSEL --- */
         .mood-container {
             width: 100%; overflow-x: auto; display: flex; scroll-snap-type: x mandatory; padding: 40px 0;
             scrollbar-width: none; -webkit-overflow-scrolling: touch;
@@ -108,64 +96,57 @@
         .mood-container::-webkit-scrollbar { display: none; }
         .spacer { flex: 0 0 15vw; }
         .mood-card {
-            flex: 0 0 70vw; height: 380px; margin: 0 15px;
-            background: var(--card-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; scroll-snap-align: center;
+            flex: 0 0 70vw; height: 400px; margin: 0 15px;
+            background: var(--card-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 44px; scroll-snap-align: center;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; text-align: center; transition: transform 0.4s ease;
+            cursor: pointer; text-align: center; transition: transform 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
         }
-        .mood-card:active { transform: scale(0.96); } /* Mobile tap response */
-        .mood-card h3 { font-size: 26px; font-weight: 300; letter-spacing: 1px; margin-bottom: 15px; }
-        .mood-card p { font-size: 13px; opacity: 0.6; font-style: italic; max-width: 80%; line-height: 1.6; margin: 0; }
+        .mood-card:active { transform: scale(0.95); }
+        .mood-card h3 { font-size: 28px; font-weight: 300; letter-spacing: 1px; margin-bottom: 15px; }
+        .mood-card p { font-size: 13px; opacity: 0.5; font-style: italic; max-width: 80%; line-height: 1.6; margin: 0; font-weight: 300; }
 
-        /* --- VERSE AREA --- */
-        #share-container { padding: 40px; border-radius: 30px; text-align: center; width: 100%; max-width: 500px; box-sizing: border-box; }
-        .verse-box { 
-            min-height: 180px; margin-bottom: 20px; 
-            opacity: 0; transition: opacity 0.4s ease; display: flex; flex-direction: column; justify-content: center;
+        .protection-list { display: flex; flex-direction: column; gap: 18px; width: 100%; max-width: 450px; margin: 0 auto; padding-bottom: 20px; }
+        .protection-item {
+            width: 100%; padding: 32px 24px; border-radius: 32px; background: var(--btn-bg);
+            border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; 
+            align-items: center; text-align: center; cursor: pointer; transition: all 0.3s ease;
         }
+        .protection-item:active { transform: scale(0.97); background: rgba(255,255,255,0.18); }
+        .protection-item .title { font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: var(--accent); }
+        .protection-item .desc { font-size: 13px; opacity: 0.7; font-weight: 300; line-height: 1.5; font-style: italic; }
+
+        #share-container { padding: 40px; border-radius: 40px; text-align: center; width: 100%; max-width: 500px; box-sizing: border-box; }
+        .verse-box { min-height: 240px; margin-bottom: 30px; opacity: 0; transition: opacity 0.5s ease; display: flex; flex-direction: column; justify-content: center; }
         .verse-box.show { opacity: 1; }
-        .arabic-text { font-family: 'Amiri', serif; font-size: 32px; line-height: 1.6; margin-bottom: 15px; direction: rtl; font-weight: 700; user-select: text; }
-        .translit-text { font-size: 14px; opacity: 0.7; font-style: italic; margin-bottom: 10px; user-select: text;}
-        .english-text { font-size: 16px; font-weight: 400; line-height: 1.6; user-select: text;}
+        .arabic-text { font-family: 'Amiri', serif; font-size: 32px; line-height: 1.9; margin-bottom: 20px; direction: rtl; font-weight: 700; }
+        .translit-text { font-size: 13px; opacity: 0.5; font-style: italic; margin-bottom: 15px; letter-spacing: 0.5px; line-height: 1.5; }
+        .english-text { font-size: 17px; font-weight: 400; line-height: 1.8; opacity: 0.95; }
 
-        /* --- BUTTONS --- */
-        button { 
-            border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 20px; 
-            background: var(--btn-bg); color: var(--text); cursor: pointer; 
-            transition: all 0.3s ease; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); outline: none;
-        }
-        button:active { background: rgba(128, 128, 128, 0.4); transform: scale(0.97); }
-        .btn-group { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; }
-        .btn-row { display: flex; gap: 10px; }
-        .action-btn { padding: 18px; font-weight: 600; letter-spacing: 1px; width: 100%; }
-        .sub-btn { flex: 1; padding: 14px; font-size: 13px; }
+        button { border: 1px solid rgba(255, 255, 255, 0.1); background: var(--btn-bg); color: var(--text); cursor: pointer; transition: 0.3s; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); outline: none; }
+        button:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.2); }
+        
+        .btn-group { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; }
+        .btn-row { display: flex; gap: 12px; }
+        .action-btn { padding: 22px; font-weight: 600; border-radius: 26px; width: 100%; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; border: 1px solid rgba(255,255,255,0.2); }
+        .sub-btn { flex: 1; padding: 18px; font-size: 11px; border-radius: 22px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-        /* --- FAVOURITES SCREEN --- */
-        .fav-scroll-container { justify-content: flex-start; overflow-y: auto; padding-top: calc(100px + var(--sat, 0px)); }
-        .fav-title { font-weight: 300; letter-spacing: 3px; text-transform: uppercase; font-size: 16px; margin-bottom: 20px; }
-        #favList { width: 100%; max-width: 500px; padding-bottom: 40px; }
-        .fav-item { padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .remove-btn { margin-top: 15px; background: none; border: none; color: #ff5f5f; font-size: 10px; letter-spacing: 1px; }
-        .empty-favs { opacity: 0.4; text-align: center; margin-top: 40px; }
+        .fav-scroll-container { justify-content: flex-start; overflow-y: auto; padding-top: calc(100px + var(--sat, 0px)); -webkit-overflow-scrolling: touch; }
+        #favList { width: 100%; max-width: 500px; padding-bottom: 100px; }
+        .fav-item { padding: 40px 25px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; background: rgba(255,255,255,0.03); margin-bottom: 20px; border-radius: 36px; border: 1px solid rgba(255,255,255,0.04); }
+        .remove-btn { margin-top: 25px; background: none; border: none; color: #ff5f5f; font-size: 10px; cursor: pointer; letter-spacing: 3px; font-weight: 700; text-transform: uppercase; }
 
-        /* --- TOAST NOTIFICATIONS --- */
         .toast {
-            position: fixed; bottom: calc(40px + var(--sab, 0px)); left: 50%; transform: translateX(-50%) translateY(100px);
-            background: rgba(0, 0, 0, 0.8); color: #fff; padding: 12px 24px; border-radius: 30px;
-            font-size: 14px; font-weight: 400; z-index: 4000; opacity: 0; pointer-events: none;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); white-space: nowrap;
+            position: fixed; bottom: calc(50px + var(--sab, 0px)); left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.85); color: #fff; padding: 16px 32px; border-radius: 40px;
+            font-size: 13px; z-index: 4000; opacity: 0; pointer-events: none; transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1.2);
+            letter-spacing: 0.5px; backdrop-filter: blur(10px);
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         
-        #loading-overlay {
-            position: fixed; inset: 0; background: var(--bg); z-index: 5000;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease; pointer-events: none; opacity: 0;
-        }
+        #loading-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; justify-content: center; align-items: center; pointer-events: none; opacity: 0; transition: 0.4s; }
         #loading-overlay.active { opacity: 1; pointer-events: all; }
-        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--accent); border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -178,34 +159,33 @@
     <button class="settings-trigger" aria-label="Settings" onclick="window.toggleSettings(event)">⚙️</button>
     <div id="panel" class="panel">
         <button class="panel-btn" onclick="window.viewFavourites()">⭐ Favourites</button>
-        <div class="theme-header">Themes</div>
-        <div class="theme-list">
-            <button onclick="window.setTheme('deepsea')">Deep Sea</button>
-            <button onclick="window.setTheme('mist')">Morning Mist</button>
-            <button onclick="window.setTheme('midnight')">Midnight</button>
-            <button onclick="window.setTheme('olive')">Olive Grove</button>
-            <button onclick="window.setTheme('golden')">Golden Hour</button>
+        <button class="panel-btn" onclick="window.showScreen('protectionLibrary')">🛡️ Safety & Protection</button>
+        <div class="panel-header">Aesthetic Themes</div>
+        <div class="theme-list" style="display: grid; gap: 8px;">
+            <button class="panel-btn" onclick="window.setTheme('deepsea')">Deep Sea</button>
+            <button class="panel-btn" onclick="window.setTheme('mist')">Morning Mist</button>
+            <button class="panel-btn" onclick="window.setTheme('midnight')">Midnight</button>
+            <button class="panel-btn" onclick="window.setTheme('olive')">Olive Grove</button>
+            <button class="panel-btn" onclick="window.setTheme('golden')">Golden Hour</button>
         </div>
     </div>
 </header>
 
-<!-- Welcome Screen -->
 <div id="welcomeScreen" class="screen" onclick="window.enterApp()">
     <h1 class="welcome-title">Invocation</h1>
-    <p class="welcome-subtitle">"Whispered du’as for every state of the heart"</p>
-    <div class="enter-hint">Tap to enter</div>
+    <p class="welcome-subtitle">Whispered du’as for every state of the heart</p>
+    <div style="position: absolute; bottom: calc(60px + var(--sab, 0px)); font-size: 9px; letter-spacing: 5px; opacity: 0.3; width: 100%; left: 0; text-align: center; text-transform: uppercase;">Tap to center</div>
 </div>
 
-<!-- Mood Carousel -->
 <div id="moodScreen" class="screen hidden">
-    <h2 class="screen-title">How is your heart?</h2>
+    <h2 style="font-weight: 300; margin-bottom: 15px; opacity: 0.8; letter-spacing: 1px;">How is your heart?</h2>
     <div class="mood-container">
         <div class="spacer"></div>
         <button class="mood-card" onclick="window.startVerses('Anxious')"><h3>Anxious</h3><p>For when the world feels too loud.</p></button>
         <button class="mood-card" onclick="window.startVerses('Depressed')"><h3>Depressed</h3><p>For when the light feels distant.</p></button>
         <button class="mood-card" onclick="window.startVerses('Lonely')"><h3>Lonely</h3><p>Reminding you He is always near.</p></button>
         <button class="mood-card" onclick="window.startVerses('Overwhelmed')"><h3>Overwhelmed</h3><p>Seeking ease within the burden.</p></button>
-        <button class="mood-card" onclick="window.startVerses('Guilty')"><h3>Ashamed</h3><p>Returning to Infinite Mercy.</p></button>
+        <button class="mood-card" onclick="window.startVerses('Ashamed')"><h3>Ashamed</h3><p>Returning to Infinite Mercy.</p></button>
         <button class="mood-card" onclick="window.startVerses('Betrayed')"><h3>Betrayed</h3><p>When only One remains faithful.</p></button>
         <button class="mood-card" onclick="window.startVerses('Fearful')"><h3>Fearful</h3><p>Finding courage in His Strength.</p></button>
         <button class="mood-card" onclick="window.startVerses('Restless')"><h3>Restless</h3><p>Stillness through remembrance.</p></button>
@@ -213,73 +193,155 @@
     </div>
 </div>
 
-<!-- Verse Display -->
+<div id="protectionLibrary" class="screen hidden scrollable-screen">
+    <button class="back-btn" onclick="window.showScreen('moodScreen')">← Back to states</button>
+    <h2 style="font-weight: 300; margin-bottom: 5px; opacity: 0.8; letter-spacing: 1px;">Safety & Protection</h2>
+    <p style="font-size: 13px; opacity: 0.5; margin-bottom: 35px; text-align: center;">Ten shields of spiritual remembrance.</p>
+    <div id="protectionContainer" class="protection-list"></div>
+</div>
+
 <div id="verseScreen" class="screen hidden">
-    <button class="back-btn" onclick="window.showScreen('moodScreen')">← CHANGE MOOD</button>
+    <button id="verseBackBtn" class="back-btn" onclick="window.showScreen('moodScreen')">← Change State</button>
     <div id="share-container"><div id="verse" class="verse-box"></div></div>
     <div class="btn-group">
-        <button class="action-btn" onclick="window.showVerse()">Another Du'a, Please</button>
+        <button id="anotherBtn" class="action-btn" onclick="window.showVerse()">Another Du’a, Please</button>
         <div class="btn-row">
-            <button id="saveBtn" class="sub-btn" onclick="window.saveFavourite()">Save ⭐</button>
-            <button id="copyBtn" class="sub-btn" onclick="window.copyVerse()">Copy 📋</button>
+            <button class="sub-btn" onclick="window.saveFavourite()">Save ⭐</button>
+            <button class="sub-btn" onclick="window.copyVerse()">Copy 📋</button>
             <button class="sub-btn" onclick="window.shareAsImage()">Share 📸</button>
         </div>
     </div>
 </div>
 
-<!-- Favourites -->
 <div id="favScreen" class="screen hidden fav-scroll-container">
-    <button class="back-btn" onclick="window.showScreen('moodScreen')">← BACK TO HOME</button>
-    <h2 class="fav-title">Saved Du'as</h2>
+    <button class="back-btn" onclick="window.showScreen('moodScreen')">← Back Home</button>
+    <h2 style="font-weight: 300; letter-spacing: 5px; text-transform: uppercase; font-size: 14px; margin-bottom: 35px; opacity: 0.7;">Favourites</h2>
     <div id="favList"></div>
 </div>
 
-<!-- Toast Notification -->
 <div id="toast" class="toast"></div>
 
-<!-- Backend Logic (Firebase replacing Supabase + PWA Config) -->
 <script type="module">
-    // Firebase Imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- CAPACITOR SETUP ---
-    const haptics = window.Capacitor?.Plugins?.Haptics;
-    
     const triggerHaptic = async (style = 'Light') => {
-        if (haptics) {
-            try { await haptics.impact({ style }); } catch(e) {}
-        }
+        try {
+            const haptics = window.Capacitor?.Plugins?.Haptics;
+            if (haptics) {
+                await haptics.impact({ style });
+            } else if (navigator.vibrate) {
+                const patterns = { 'Light': 15, 'Medium': 30, 'Heavy': 50 };
+                navigator.vibrate(patterns[style] || 15);
+            }
+        } catch(e) {}
     };
 
-    // --- FIREBASE CONFIG (Managed Persistence instead of Supabase per rules) ---
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+    const firebaseConfig = JSON.parse(__firebase_config);
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'invocation-app-id';
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'invocation-app-pro';
     
     let userId = null;
     let favoritesList = [];
     let unsubscribeFavs = null;
+    const moodHistory = {};
 
-    const THEME_KEY = 'inv-theme';
     const moodVerses = {
-        Anxious: ["اللهم إني أعوذ بك من الهم والحزن\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.", "حسبي الله لا إله إلا هو عليه توكلت\nḤasbiyallāhu lā ilāha illā Huwa, ‘alayhi tawakkaltu\nAllah is sufficient for me.", "اللهم رحمتك أرجو فلا تكلني إلى نفسي طرفة عين\nAllāhumma raḥmataka arjū fa-lā takilnī ilā nafsī ṭarfata ‘ayn\nO Allah, I hope for Your mercy."],
-        Depressed: ["لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\nLā ilāha illā anta subḥānaka innī kuntu minaẓ-ẓālimīn\nThere is no deity except You; glory be to You.", "إِنَّ مَعَ الْعُسْرِ يُسْرًا\nInna ma‘al usri yusra\nIndeed, with hardship comes ease.", "اللَّهُمَّ اشْفِ صَدْرِي\nAllahumma ishfi sadri\nO Allah, heal my heart."],
-        Lonely: ["اللَّهُمَّ آنِسْ وَحْشَتِي\nAllahumma anis wahshati\nO Allah, comfort my loneliness.", "وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ\nWa huwa ma‘akum ayna mā kuntum\nAnd He is with you wherever you are.", "رَبِّ لَا تَذَرْنِي فَرْدًا وَأَنْتَ خَيْرُ الْوارِثِينَ\nRabbi la tadharni fardan wa anta khayrul waritheen\nMy Lord, do not leave me alone."],
-        Overwhelmed: ["لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا\nLa yukallifullahu nafsan illa wus‘aha\nAllah does not burden a soul beyond what it can bear.", "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي\nRabbi ishrah li sadri wa yassir li amri\nMy Lord, expand my chest and make my task easy.", "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ\nHasbunallahu wa ni‘mal wakeel\nAllah is sufficient for us."],
-        Guilty: ["لَا تَقْنَطُوا مِنْ رَحْمَةِ اللَّهِ\nLa taqnatoo min rahmatillah\nDo not despair of the mercy of Allah.", "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ\nRabbi ighfir li wa tub ‘alayya\nMy Lord, forgive me and accept my repentance.", "إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا\nInnallaha yaghfiru dhunooba jamee‘a\nIndeed, Allah forgives all sins."],
-        Betrayed: ["فَصَبْرٌ جَمِيلٌ\nFasabrun jameel\nSo patience is most fitting.", "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ\nInna Allaha ma‘a as-sabireen\nIndeed, Allah is with the patient.", "وَأُفَوِّضُ أَمْرِي إِلَى اللَّهِ\nWa ufawwidu amri ilallah\nI entrust my affair to Allah."],
-        Fearful: ["لَا تَخَافْ إِنَّ اللَّهَ مَعَنَا\nLa takhaf innallaha ma‘ana\nDo not fear, indeed Allah is with us.", "إِنِّي تَوَكَّلْتُ عَلَى اللَّهِ\nInni tawakkaltu ‘ala Allah\nIndeed, I place my trust in Allah.", "اللَّهُمَّ آمِنْ رَوْعَاتِي\nAllahumma amin raw‘ati\nO Allah, grant me safety in my fear."],
-        Restless: ["أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\nAla bidhikrillahi tatma’innul quloob\nVerily, in the remembrance of Allah do hearts find rest.", "اللَّهُمَّ أَلْهِمْنِي السَّكِينَةَ\nAllahumma alhimni as-sakeenata\nO Allah, inspire in me peace.", "يَا حَيُّ يَا قَيُّومُ أَصْلِحْ لِي شَأْنِي كُلَّهُ\nYa Hayyu Ya Qayyum aslih li sha’ni kullahu\nO Ever-Living, set right all my affairs."]
+        Anxious: [
+            "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.",
+            "حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ\nḤasbiyallāhu lā ilāha illā Huwa ‘alayhi tawakkaltu\nAllah is sufficient for me; there is no deity except Him. In Him I trust.",
+            "اللَّهُمَّ رَحْمَتَكَ أَرْجُو فَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ\nAllāhumma raḥmataka arjū falā takilnī ilā nafsī ṭarfata ‘ayn\nO Allah, I hope for Your mercy, do not leave me to myself for a blink of an eye."
+        ],
+        Depressed: [
+            "لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\nLā ilāha illā anta subḥānaka innī kuntu min al-ẓālimīn\nThere is no deity except You; glory be to You. Indeed, I have been of the wrongdoers.",
+            "إِنَّ مَعَ الْعُسْرِ يُسْرًا\nInna ma‘al ‘usri yusrā\nIndeed, with hardship comes ease. (94:6)",
+            "اللَّهُمَّ اشْفِ صَدْرِي\nAllāhumma-shfi ṣadrī\nO Allah, heal my chest and grant me peace."
+        ],
+        Lonely: [
+            "اللَّهُمَّ آنِسْ وَحْشَتِي\nAllāhumma ānis waḥshatī\nO Allah, comfort my loneliness.",
+            "وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ\nWa huwa ma‘akum ayna mā kuntum\nAnd He is with you wherever you are. (57:4)",
+            "رَبِّ لَا تَذَرْنِي فَرْدًا وَأَنتَ خَيْرُ الْوَارِثِينَ\nRabbi lā tadharnī fardan wa anta khayrul wārithīn\nMy Lord, do not leave me alone, and You are the best of inheritors."
+        ],
+        Overwhelmed: [
+            "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا\nLā yukallifullāhu nafsan illā wus‘ahā\nAllah does not burden a soul beyond what it can bear.",
+            "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي\nRabbi-shraḥ lī ṣadrī wa yassir lī amrī\nMy Lord, expand for me my chest and ease for me my task.",
+            "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ\nḤasbunallāhu wa ni‘mal wakīl\nAllah is sufficient for us, and He is the best Disposer of affairs."
+        ],
+        Ashamed: [
+            "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ\nLā taqnaṭū min raḥmatillāh\nDo not despair of the mercy of Allah. (39:53)",
+            "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ إِنَّكَ أَنتَ التَّوَّابُ الرَّحِيمُ\nRabbi-ghfir lī wa tub ‘alayya innaka anta-ttawwābul raḥīm\nMy Lord, forgive me and accept my repentance; You are the Accepting of repentance, the Merciful."
+        ],
+        Betrayed: [
+            "فَصَبْرٌ جَمِيلٌ وَاللَّهُ الْمُسْتَعَانُ عَلَىٰ مَا تَصِفُونَ\nFa-ṣabrun jamīlun wallāhul musta‘ānu ‘alā mā taṣifūn\nSo patience is most fitting. And Allah is the one sought for help against that which you describe.",
+            "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ\nInnallāha ma‘a al-ṣābirīn\nIndeed, Allah is with the patient. (2:153)"
+        ],
+        Fearful: [
+            "لَا تَخَفْ إِنَّ اللَّهَ مَعَنَا\nLā takhaf innallāha ma‘anā\nDo not fear, indeed Allah is with us. (9:40)",
+            "اللَّهُمَّ آمِنْ رَوْعَاتِي وَاسْتُرْ عَوْرَاتِي\nAllāhumma āmin raw‘ātī wa-stur ‘awrātī\nO Allah, grant me safety in my fears and cover my flaws."
+        ],
+        Restless: [
+            "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ\nAlā bidhikrillāhi taṭma’innul qulūb\nVerily, in the remembrance of Allah do hearts find rest.",
+            "اللَّهُمَّ أَلْهِمْنِي السَّكِينَةَ\nAllāhumma alhimnī as-sakīnah\nO Allah, inspire in me stillness and tranquility."
+        ],
+        EvilEye: [
+            "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ وَمِن كُلِّ عَيْنٍ لَّامَّةٍ\nA‘ūdhu bi-kalimātillāhit-tāmmah min kulli shayṭānin wa hāmmah wa min kulli ‘aynin lāmmah\nI seek refuge in the perfect words of Allah from every devil, poisonous creature, and every evil eye."
+        ],
+        Healing: [
+            "اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَاسَ اشْفِ أَنْتَ الشَّافِي لَا شِفَاءَ إِلَّا شِفَاؤُكَ\nAllāhumma rabban-nāsi adhhibil-ba’sash-fi antash-shāfī lā shifā’a illā shifā’uk\nO Allah, Lord of mankind, remove the harm and heal, for You are the Healer; there is no cure but Your cure."
+        ],
+        Safety: [
+            "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ\nBismillāhilladhī lā yaḍurru ma‘asmihi shay’un fil-arḍi wa lā fis-samā’ wa huwas-samī‘ul ‘alīm\nIn the Name of Allah with Whose Name nothing can cause harm in earth or heaven, and He is the All-Hearing, All-Knowing."
+        ],
+        Envy: [
+            "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ... مِن شَرِّ حَاسِدٍ إِذَا حَسَدَ\nQul a‘ūdhu bi-rabbil-falaq... min sharri ḥāsidin idhā ḥasad\nSay: I seek refuge with the Lord of the daybreak... from the evil of an envier when he envies."
+        ],
+        Home: [
+            "اللَّهُمَّ بَارِكْ لِي فِيمَا رَزَقْتَنِي وَقِنِي عَذَابَ النَّارِ\nAllāhumma bārik lī fīmā razaqtanī wa qinī ‘adhāban-nār\nO Allah, bless me in what You have provided me and protect me from the punishment of the Fire."
+        ],
+        Family: [
+            "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا\nRabbana hab lanā min azwājinā wa dhurriyyātinā qurrata a‘yunin wa-j‘alnā lil-muttaqīna imāmā\nOur Lord, grant us from among our wives and offspring comfort to our eyes and make us leaders of the righteous."
+        ],
+        Debt: [
+            "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ\nAllāhummak-finī biḥalālika ‘an ḥarāmika wa aghninī bifaḍlika ‘amman siwāk\nO Allah, suffice me with what is lawful instead of what is forbidden and make me independent of all others through Your grace."
+        ],
+        Travel: [
+            "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ\nSubḥāna-alladhī sakhkhara lanā hādhā wa mā kunnā lahu muqrinīn\nGlory be to Him Who has subjected this to us, and we could never have it of our own efforts."
+        ],
+        Magic: [
+            "مَا جِئْتُم بِهِ السِّحْرُ إِنَّ اللَّهَ سَيُبْطِلُهُ إِنَّ اللَّهَ لَا يُصْلِحُ عَمَلَ الْمُفْسِدِينَ\nMā ji’tum bihis-siḥru innallāha sayubṭiluh\nWhat you have brought is magic; indeed, Allah will expose its worthlessness. Allah does not amend the work of corrupters."
+        ],
+        Oppression: [
+            "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ نِعْمَ الْمَوْلَىٰ وَنِعْمَ النَّصِيرُ\nḤasbunallāhu wa ni‘mal wakīl ni‘mal mawlā wa ni‘man-naṣīr\nAllah is sufficient for us, and He is the best Disposer of affairs, the best Protector, and the best Helper."
+        ]
     };
 
-    let currentMood = "", lastIdx = -1;
-    let toastTimeout;
+    const protectionCategories = [
+        { id: 'EvilEye', title: 'The Evil Eye', desc: 'Protection against the gaze of others.' },
+        { id: 'Healing', title: 'Health & Healing', desc: 'Seeking restoration and relief from pain.' },
+        { id: 'Safety', title: 'Daily Safety', desc: 'Refuge from unexpected calamities.' },
+        { id: 'Envy', title: 'Envy (Hasad)', desc: 'Guarding the soul from malicious jealousy.' },
+        { id: 'Home', title: 'Peace at Home', desc: 'Blessings for your dwelling and space.' },
+        { id: 'Family', title: 'Family Security', desc: 'Safekeeping for your parents and children.' },
+        { id: 'Debt', title: 'Financial Ease', desc: 'Lifting the weight of heavy burdens.' },
+        { id: 'Travel', title: 'The Wayfarer', desc: 'Safe passage during your journeys.' },
+        { id: 'Magic', title: 'Unseen Energies', desc: 'Removing dark and negative influences.' },
+        { id: 'Oppression', title: 'Injustice', desc: 'A shield when facing unfair treatment.' }
+    ];
 
-    // --- AUTHENTICATION & SYNC ---
+    const subscribeToFavorites = (user) => {
+        if (!user) return;
+        const favRef = collection(db, 'artifacts', appId, 'users', user.uid, 'favourites');
+        unsubscribeFavs = onSnapshot(favRef, (snap) => {
+            favoritesList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            if (!document.getElementById('favScreen').classList.contains('hidden')) {
+                window.renderFavourites();
+            }
+        }, (err) => console.error("Firestore sync error:", err));
+    };
+
     const initAuth = async () => {
         try {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -287,272 +349,201 @@
             } else {
                 await signInAnonymously(auth);
             }
-        } catch(e) { console.error("Auth init error:", e); }
+        } catch (err) { console.error("Auth init error:", err); }
     };
-    initAuth();
 
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            userId = user.uid;
-            subscribeToFavorites();
-        } else {
-            userId = null;
-            if(unsubscribeFavs) unsubscribeFavs();
-        }
+        if (user) { userId = user.uid; subscribeToFavorites(user); }
+        else { userId = null; if (unsubscribeFavs) unsubscribeFavs(); }
     });
 
-    const subscribeToFavorites = () => {
-        if (!userId) return;
-        const favRef = collection(db, 'artifacts', appId, 'users', userId, 'favourites');
-        
-        unsubscribeFavs = onSnapshot(favRef, (snapshot) => {
-            favoritesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            // Refresh view if currently open
-            if(!document.getElementById('favScreen').classList.contains('hidden')) {
-                window.viewFavourites();
-            }
-        }, (error) => {
-            console.error("Error fetching favorites:", error);
-        });
+    initAuth();
+
+    window.showToast = (msg) => {
+        triggerHaptic('Light');
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
     };
 
-    // --- UTILITIES ---
-    window.showToast = (message) => {
-        triggerHaptic('Light');
-        const toast = document.getElementById('toast');
-        toast.innerText = message;
-        toast.classList.add('show');
-        clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
     function formatVerse(text) {
+        if (!text) return '';
         const parts = text.split('\n');
-        if(parts.length === 3) {
-            return `<div class="arabic-text">${parts[0]}</div>
-                    <div class="translit-text">${parts[1]}</div>
-                    <div class="english-text">${parts[2]}</div>`;
-        }
-        return `<div class="english-text">${text}</div>`;
+        return parts.length >= 3 ? 
+            `<div class="arabic-text">${parts[0]}</div><div class="translit-text">${parts[1]}</div><div class="english-text">${parts[2]}</div>` :
+            `<div class="english-text">${text}</div>`;
     }
 
-    // --- NAVIGATION ---
-    window.enterApp = () => { 
+    window.enterApp = () => {
         triggerHaptic('Medium');
-        document.getElementById('welcomeScreen').classList.add('hidden'); 
-        setTimeout(() => { 
-            document.getElementById('welcomeScreen').style.display = 'none'; 
-            document.getElementById('mainHeader').classList.remove('hidden'); 
-            document.getElementById('moodScreen').classList.remove('hidden'); 
-        }, 500); 
-    }
+        document.getElementById('welcomeScreen').classList.add('hidden');
+        document.getElementById('mainHeader').classList.remove('hidden');
+        document.getElementById('moodScreen').classList.remove('hidden');
+    };
 
-    window.showScreen = (id) => { 
+    window.showScreen = (id) => {
         triggerHaptic('Light');
-        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); 
-        document.getElementById('panel').classList.remove('show'); 
-        document.getElementById(id).classList.remove('hidden'); 
-    }
-
-    // --- CORE LOGIC ---
-    window.startVerses = (mood) => { 
-        currentMood = mood; 
-        window.showScreen('verseScreen'); 
-        window.showVerse(); 
-    }
-    
-    window.showVerse = () => { 
-        triggerHaptic('Light');
-        const v = document.getElementById('verse'); 
-        const list = moodVerses[currentMood]; 
-        let idx; 
-        do { idx = Math.floor(Math.random() * list.length); } while (idx === lastIdx && list.length > 1); 
-        lastIdx = idx; 
+        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+        const screen = document.getElementById(id);
+        screen.classList.remove('hidden');
+        if (screen.classList.contains('scrollable-screen')) screen.scrollTop = 0;
         
-        v.classList.remove('show'); 
-        setTimeout(() => { 
-            v.dataset.rawText = list[idx];
+        document.getElementById('panel').classList.remove('show');
+        if (id === 'favScreen') window.renderFavourites();
+    };
+
+    window.startVerses = (mood) => {
+        window.currentMood = mood;
+        if (!moodHistory[mood]) moodHistory[mood] = [];
+        
+        const isProtection = protectionCategories.some(c => c.id === mood);
+        const backBtn = document.getElementById('verseBackBtn');
+        const anotherBtn = document.getElementById('anotherBtn');
+
+        if (isProtection) {
+            backBtn.onclick = () => window.showScreen('protectionLibrary');
+            backBtn.innerText = "← Library";
+            anotherBtn.style.display = 'none';
+        } else {
+            backBtn.onclick = () => window.showScreen('moodScreen');
+            backBtn.innerText = "← Change State";
+            anotherBtn.style.display = 'block';
+        }
+
+        window.showScreen('verseScreen');
+        window.showVerse();
+    };
+
+    window.showVerse = () => {
+        triggerHaptic('Light');
+        const v = document.getElementById('verse');
+        const list = moodVerses[window.currentMood];
+        if (!list) return;
+        const history = moodHistory[window.currentMood];
+        
+        let idx;
+        let attempts = 0;
+        do {
+            idx = Math.floor(Math.random() * list.length);
+            attempts++;
+        } while (history.includes(idx) && attempts < 10 && list.length > 1);
+        
+        history.push(idx);
+        if (history.length > 5) history.shift();
+
+        v.classList.remove('show');
+        setTimeout(() => {
+            v.dataset.raw = list[idx];
             v.innerHTML = formatVerse(list[idx]);
-            v.classList.add('show'); 
-        }, 200); 
-    }
-    
-    window.saveFavourite = async () => {
-        if (!userId) return window.showToast("Authenticating... please wait.");
-        triggerHaptic('Medium');
-        
-        const rawText = document.getElementById('verse').dataset.rawText;
-        if(favoritesList.find(f => f.rawText === rawText)) {
-            return window.showToast("Already in Favourites");
-        }
+            v.classList.add('show');
+        }, 250);
+    };
 
+    window.saveFavourite = async () => {
+        if (!auth.currentUser) return window.showToast("Connection issue...");
+        const rawText = document.getElementById('verse').dataset.raw;
+        if (!rawText) return;
+        if (favoritesList.find(f => f.rawText === rawText)) return window.showToast("Already Saved");
+        
+        document.getElementById('loading-overlay').classList.add('active');
         try {
-            document.getElementById('loading-overlay').classList.add('active');
-            const favRef = collection(db, 'artifacts', appId, 'users', userId, 'favourites');
-            const newDocRef = doc(favRef);
-            await setDoc(newDocRef, { rawText, timestamp: Date.now() });
+            const ref = doc(collection(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'favourites'));
+            await setDoc(ref, { rawText, timestamp: Date.now() });
             window.showToast("Saved to Favourites ⭐");
         } catch (e) {
-            window.showToast("Failed to save");
-            console.error(e);
+            window.showToast("Sync Error");
         } finally {
             document.getElementById('loading-overlay').classList.remove('active');
         }
-    }
+    };
 
-    window.viewFavourites = () => {
-        triggerHaptic('Light');
-        const screen = document.getElementById('favScreen'); 
-        screen.scrollTo(0,0);
+    window.renderFavourites = () => {
         const list = document.getElementById('favList');
-        
-        list.innerHTML = favoritesList.length ? "" : "<p class='empty-favs'>No saved du'as yet.</p>";
-        
-        // Sort by newest first
-        const sortedFavs = [...favoritesList].sort((a,b) => b.timestamp - a.timestamp);
-
-        sortedFavs.forEach((f) => {
-            const d = document.createElement('div'); 
+        list.innerHTML = favoritesList.length ? "" : "<p style='opacity:0.4; text-align:center; padding-top:60px; font-style:italic;'>No saved du’as yet.</p>";
+        [...favoritesList].sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach(f => {
+            const d = document.createElement('div');
             d.className = "fav-item";
-            d.innerHTML = `
-                ${formatVerse(f.rawText)}
-                <button class="remove-btn" onclick="window.removeFav('${f.id}')">REMOVE</button>
-            `;
+            d.innerHTML = `${formatVerse(f.rawText)}<button class="remove-btn" onclick="window.removeFav('${f.id}')">Unsave</button>`;
             list.appendChild(d);
         });
-        window.showScreen('favScreen');
-    }
+    };
 
-    window.removeFav = async (id) => { 
-        if (!userId) return;
+    window.viewFavourites = () => window.showScreen('favScreen');
+
+    window.removeFav = async (id) => {
+        if (!auth.currentUser) return;
         triggerHaptic('Heavy');
-        try {
-            await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'favourites', id));
-            window.showToast("Removed from Favourites");
-        } catch (e) {
-            console.error(e);
-        }
-    }
+        try { await deleteDoc(doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'favourites', id)); } catch(e) {}
+    };
 
-    window.copyVerse = () => { 
-        triggerHaptic('Light');
-        const textToCopy = document.getElementById('verse').dataset.rawText;
-        
-        // Use document.execCommand for isolated environments/iframes
-        const textArea = document.createElement("textarea");
-        textArea.value = textToCopy;
-        textArea.style.position = "fixed";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            window.showToast("Copied to clipboard 📋");
-        } catch (err) {
-            window.showToast("Failed to copy");
-        }
-        document.body.removeChild(textArea);
-    }
+    window.copyVerse = () => {
+        const text = document.getElementById('verse').dataset.raw;
+        if (!text) return;
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = 'fixed'; 
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        window.showToast("Copied to clipboard 📋");
+    };
 
-    // --- SETTINGS & EXTRAS ---
-    window.setTheme = (t) => { 
-        triggerHaptic('Light');
-        document.body.className = t; 
-        try { localStorage.setItem(THEME_KEY, t); } catch(e) {}
-    }
-
-    window.toggleSettings = (event) => { 
-        triggerHaptic('Light');
-        event.stopPropagation(); 
-        const p = document.getElementById('panel'); 
-        p.classList.toggle('show');
-    }
-
-    document.addEventListener('click', (e) => {
-        const panel = document.getElementById('panel');
-        if (panel.classList.contains('show') && !panel.contains(e.target)) {
-            panel.classList.remove('show');
-        }
-    });
-
-    window.shareAsImage = () => { 
+    window.shareAsImage = () => {
         triggerHaptic('Medium');
-        const container = document.getElementById('share-container'); 
-        const originalBg = container.style.background; 
-        
-        container.style.background = getComputedStyle(document.body).backgroundImage; 
-        window.showToast("Preparing image...");
-        
-        html2canvas(container, { backgroundColor: null, scale: 2 }).then(canvas => { 
-            const link = document.createElement('a'); 
-            link.download = `Invocation-${currentMood}.png`; 
-            link.href = canvas.toDataURL(); 
-            link.click(); 
-            container.style.background = originalBg; 
+        const area = document.getElementById('share-container');
+        const originalBg = area.style.background;
+        area.style.background = getComputedStyle(document.body).backgroundImage;
+        area.style.borderRadius = "0"; 
+        window.showToast("Generating image...");
+        html2canvas(area, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Invocation-${window.currentMood || 'dua'}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+            area.style.background = originalBg;
+            area.style.borderRadius = "40px";
+            window.showToast("Image saved 📸");
         }).catch(() => {
-            window.showToast("Could not generate image");
-            container.style.background = originalBg; 
-        }); 
-    }
-
-    // --- INIT ---
-    window.onload = () => {
-        let savedTheme = 'deepsea';
-        try { savedTheme = localStorage.getItem(THEME_KEY) || 'deepsea'; } catch(e) {}
-        window.setTheme(savedTheme);
+            area.style.background = originalBg;
+            area.style.borderRadius = "40px";
+            window.showToast("Snapshot failed");
+        });
     };
 
-    // --- DYNAMIC PWA GENERATION (For Single File Compatibility) ---
-    // In a real project, this manifest is in 'manifest.json'
-    const manifestJson = {
-        "name": "Invocation",
-        "short_name": "Invocation",
-        "start_url": ".",
-        "display": "standalone",
-        "background_color": "#09203f",
-        "theme_color": "#09203f",
-        "description": "Whispered du’as for every state of the heart",
-        "icons": [{
-            "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2309203f'/><text x='50%' y='50%' font-size='40' font-family='sans-serif' fill='white' text-anchor='middle' dy='.3em'>I</text></svg>",
-            "sizes": "512x512",
-            "type": "image/svg+xml",
-            "purpose": "any maskable"
-        }]
+    window.setTheme = (t) => { 
+        triggerHaptic('Light'); 
+        document.body.className = t; 
+        document.getElementById('panel').classList.remove('show'); 
     };
     
-    const manifestBlob = new Blob([JSON.stringify(manifestJson)], {type: 'application/json'});
-    const manifestUrl = URL.createObjectURL(manifestBlob);
-    const manifestLink = document.createElement('link');
-    manifestLink.rel = 'manifest';
-    manifestLink.href = manifestUrl;
-    document.head.appendChild(manifestLink);
+    window.toggleSettings = (e) => { 
+        triggerHaptic('Light'); 
+        if(e) e.stopPropagation(); 
+        document.getElementById('panel').classList.toggle('show'); 
+    };
 
-    // In a real project, this logic is inside 'sw.js'
-    const swCode = `
-        const CACHE_NAME = 'invocation-v1';
-        self.addEventListener('install', e => {
-            self.skipWaiting();
+    const buildProtectionUI = () => {
+        const container = document.getElementById('protectionContainer');
+        container.innerHTML = protectionCategories.map(cat => `
+            <div class="protection-item" onclick="window.startVerses('${cat.id}')">
+                <div class="title">${cat.title}</div>
+                <div class="desc">${cat.desc}</div>
+            </div>
+        `).join('');
+    };
+
+    window.addEventListener('load', () => {
+        buildProtectionUI();
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('panel');
+            const trigger = document.querySelector('.settings-trigger');
+            if (panel && panel.classList.contains('show') && !panel.contains(e.target) && e.target !== trigger) {
+                panel.classList.remove('show');
+            }
         });
-        self.addEventListener('activate', e => {
-            e.waitUntil(clients.claim());
-        });
-        self.addEventListener('fetch', e => {
-            if(e.request.method !== 'GET' || e.request.url.includes('firestore')) return;
-            e.respondWith(
-                caches.match(e.request).then(res => res || fetch(e.request))
-            );
-        });
-    `;
-    const swBlob = new Blob([swCode], {type: 'application/javascript'});
-    const swUrl = URL.createObjectURL(swBlob);
-    
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register(swUrl).catch(err => {
-                console.log('SW Registration fallback active.');
-            });
-        });
-    }
+    });
 </script>
 </body>
 </html>
