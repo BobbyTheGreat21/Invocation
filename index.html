@@ -38,27 +38,49 @@
         }
         header.visible { opacity: 1; visibility: visible; }
         .brand { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; opacity: 0.6; cursor: pointer; }
-        .settings-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: inherit; padding: 8px; z-index: 2200; }
+        
+        /* Premium Settings Icon */
+        .settings-btn { 
+            background: none; border: none; cursor: pointer; color: inherit; 
+            padding: 8px; z-index: 2200; display: flex; align-items: center; justify-content: center;
+        }
+        .settings-btn svg { width: 22px; height: 22px; opacity: 0.8; stroke-width: 1.5; }
 
         .panel { 
             position: absolute; right: 25px; top: calc(75px + var(--sat)); 
             background: var(--btn-bg); backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px);
-            padding: 20px; border-radius: 28px; width: 240px; border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 20px; border-radius: 28px; width: 220px; border: 1px solid rgba(255, 255, 255, 0.1); 
             z-index: 2100; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: 0.3s ease;
         }
         .panel.active { opacity: 1; visibility: visible; transform: translateY(0); }
-        .panel-btn { width: 100%; padding: 12px; margin-bottom: 6px; border-radius: 12px; font-size: 13px; text-align: left; background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .panel-btn { width: 100%; padding: 12px; margin-bottom: 6px; border-radius: 12px; font-size: 12px; text-align: left; background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+        .theme-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* New Quick Access Bar */
+        .quick-nav {
+            position: fixed; bottom: calc(30px + var(--sab)); left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; z-index: 1500; opacity: 0; pointer-events: none; transition: 0.5s ease;
+        }
+        .quick-nav.visible { opacity: 1; pointer-events: auto; }
+        .nav-pill {
+            background: var(--btn-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 12px 24px; border-radius: 30px; font-size: 10px; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; color: inherit;
+            display: flex; align-items: center; gap: 8px; transition: 0.3s;
+        }
+        .nav-pill:active { transform: scale(0.95); opacity: 0.8; }
+        .nav-pill svg { width: 14px; height: 14px; }
 
         .screen { 
             position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
             opacity: 0; visibility: hidden; transition: 0.4s ease; transform: scale(0.96);
-            padding: 20px; padding-top: calc(80px + var(--sat)); padding-bottom: calc(20px + var(--sab));
+            padding: 20px; padding-top: calc(80px + var(--sat)); padding-bottom: calc(100px + var(--sab));
             z-index: 500; pointer-events: none;
         }
         .screen.active { opacity: 1; visibility: visible; transform: scale(1); pointer-events: auto; }
         .screen-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; display: block; }
 
-        #welcomeScreen { z-index: 3000; padding-top: 0; cursor: pointer; }
+        #welcomeScreen { z-index: 3000; padding-top: 0; cursor: pointer; padding-bottom: 0; }
         .welcome-title { font-weight: 300; letter-spacing: 12px; text-transform: uppercase; font-size: 2.2rem; margin-bottom: 20px; text-align: center; }
         .welcome-subtitle { font-style: italic; opacity: 0.6; line-height: 1.8; font-size: 15px; text-align: center; max-width: 280px; }
 
@@ -86,13 +108,13 @@
         .main-btn.hidden { display: none; }
         .icon-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 10px; text-transform: uppercase; background: var(--btn-bg); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-weight: 600; letter-spacing: 1px; }
 
-        .list-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 500px; padding-bottom: 40px; margin: 0 auto; }
+        .list-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 500px; padding-bottom: 120px; margin: 0 auto; }
         .list-item { padding: 25px; border-radius: 28px; background: var(--btn-bg); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; text-align: center; }
         .list-item h4 { font-size: 14px; margin-bottom: 4px; letter-spacing: 1px; font-weight: 600; }
         .list-item p { font-size: 11px; opacity: 0.5; font-style: italic; }
 
         .toast {
-            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%) translateY(100px);
+            position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: rgba(0,0,0,0.85); color: white; padding: 14px 28px; border-radius: 30px;
             font-size: 11px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; z-index: 9000; pointer-events: none; letter-spacing: 1px;
         }
@@ -109,16 +131,18 @@
 
 <header id="appHeader">
     <div class="brand" onclick="forceHome()">Invocation</div>
-    <button class="settings-btn" id="triggerSettings">⚙️</button>
+    <button class="settings-btn" id="triggerSettings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" />
+        </svg>
+    </button>
     <div id="settingsPanel" class="panel">
-        <button class="panel-btn" onclick="navigate('favScreen')">Favourites</button>
-        <button class="panel-btn" onclick="navigate('protectScreen')">Protection</button>
-        <div style="font-size: 9px; opacity: 0.4; letter-spacing: 2px; margin: 15px 5px 5px;">THEMES</div>
-        <button class="panel-btn" onclick="setTheme('deepsea')">Deep Sea</button>
-        <button class="panel-btn" onclick="setTheme('mist')">Mist</button>
-        <button class="panel-btn" onclick="setTheme('midnight')">Midnight</button>
-        <button class="panel-btn" onclick="setTheme('golden')">Golden Hour</button>
-        <button class="panel-btn" onclick="setTheme('olive')">Olive Grove</button>
+        <div style="font-size: 9px; opacity: 0.4; letter-spacing: 2px; margin: 0 5px 15px;">ATMOSPHERE</div>
+        <button class="panel-btn" onclick="setTheme('deepsea')">Deep Sea <span class="theme-dot" style="background:#09203f"></span></button>
+        <button class="panel-btn" onclick="setTheme('mist')">Mist <span class="theme-dot" style="background:#f5f7fa"></span></button>
+        <button class="panel-btn" onclick="setTheme('midnight')">Midnight <span class="theme-dot" style="background:#0f1115"></span></button>
+        <button class="panel-btn" onclick="setTheme('golden')">Golden Hour <span class="theme-dot" style="background:#ffdf91"></span></button>
+        <button class="panel-btn" onclick="setTheme('olive')">Olive Grove <span class="theme-dot" style="background:#4a5d4b"></span></button>
     </div>
 </header>
 
@@ -164,6 +188,17 @@
     </div>
 </div>
 
+<nav id="quickNav" class="quick-nav">
+    <button class="nav-pill" onclick="navigate('protectScreen')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Protection
+    </button>
+    <button class="nav-pill" onclick="navigate('favScreen')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Saved
+    </button>
+</nav>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -194,7 +229,7 @@
         ],
         Lonely: [
             "اللَّهُمَّ آنِسْ وَحْشَتِي\nAllāhumma ānis waḥshatī\nO Allah, comfort my loneliness.",
-            "وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ\nWa huwa ma‘akum ayna mā kuntum\nAnd He is with you wherever you are.",
+            "وَهُوة مَعَكُمْ أَيْنَ مَا كُنتُمْ\nWa huwa ma‘akum ayna mā kuntum\nAnd He is with you wherever you are.",
             "وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ\nWa naḥnu aqrabu ilayhi min ḥablil-warīd\nAnd We are closer to him than his jugular vein.",
             "أَلَيْسَ اللَّهُ بِكَافٍ عَبْدَهُ\nAlaysallāhu bi-kāfin ‘abdah\nIs Allah not sufficient for His servant?",
             "رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ\nRabbi innī limā anzalta ilayya min khayrin faqīr\nMy Lord, indeed I am in need of whatever good You would send down to me.",
@@ -340,10 +375,19 @@
         if (target) target.classList.add('active');
 
         const header = document.getElementById('appHeader');
+        const qNav = document.getElementById('quickNav');
+
         if (screenId === 'welcomeScreen') {
             header.classList.remove('visible');
+            qNav.classList.remove('visible');
         } else {
             header.classList.add('visible');
+            // Hide quick nav on detail screens (verse content) for focus
+            if (screenId === 'moodScreen' || screenId === 'protectScreen' || screenId === 'favScreen') {
+                qNav.classList.add('visible');
+            } else {
+                qNav.classList.remove('visible');
+            }
         }
 
         if (screenId === 'favScreen') renderFavs();
@@ -360,7 +404,6 @@
         if (!pool) return;
         haptic();
         
-        // Check if current pick is part of protection library to hide the next button
         const isProtection = protectionLibrary.some(p => p.id === state.currentMood);
         const nextBtn = document.getElementById('nextBtn');
         
@@ -460,11 +503,12 @@
         document.getElementById('welcomeScreen').onclick = () => navigate('moodScreen');
         document.getElementById('triggerSettings').onclick = (e) => {
             e.stopPropagation();
+            haptic();
             document.getElementById('settingsPanel').classList.toggle('active');
         };
 
         document.addEventListener('click', (e) => {
-            if (!document.getElementById('settingsPanel').contains(e.target) && e.target.id !== 'triggerSettings') {
+            if (!document.getElementById('settingsPanel').contains(e.target) && !e.target.closest('#triggerSettings')) {
                 document.getElementById('settingsPanel').classList.remove('active');
             }
         });
