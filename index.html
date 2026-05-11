@@ -2,19 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport scaling removed to allow a11y zooming -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <!-- PWA Primary Tags -->
+    <!-- Viewport updated for native mobile edge-to-edge support -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    
+    <!-- PWA & Mobile Native Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#09203f">
-    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2309203f'/><text x='50%' y='50%' font-size='40' font-family='sans-serif' fill='white' text-anchor='middle' dy='.3em'>I</text></svg>">
     
     <title>Invocation</title>
     
     <!-- External Resources -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Capacitor Core & Plugins (CDN for Single File Prototype) -->
+    <script src="https://unpkg.com/@capacitor/core@5.0.0/dist/capacitor.global.js"></script>
+    <script src="https://unpkg.com/@capacitor/haptics@5.0.0/dist/plugin.js"></script>
     
     <style>
         :root {
@@ -24,6 +29,9 @@
             --btn-bg: rgba(255, 255, 255, 0.12);
             --card-bg: rgba(255, 255, 255, 0.08);
             --transition-speed: 0.6s;
+            /* Safe area for native mobile notches */
+            --sat: env(safe-area-inset-top);
+            --sab: env(safe-area-inset-bottom);
         }
 
         /* --- THEMES --- */
@@ -39,12 +47,14 @@
             display: flex; flex-direction: column;
             overflow: hidden; transition: background var(--transition-speed) ease; 
             -webkit-tap-highlight-color: transparent;
+            user-select: none; /* Native app feel */
         }
 
         /* --- HEADER & SETTINGS --- */
         header {
             position: fixed; top: 0; left: 0; right: 0;
-            padding: 25px 30px; display: flex; justify-content: space-between; align-items: center;
+            padding: calc(25px + var(--sat, 0px)) 30px 25px 30px; 
+            display: flex; justify-content: space-between; align-items: center;
             z-index: 2005;
         }
         .brand-link {
@@ -56,16 +66,14 @@
             opacity: 0.8; cursor: pointer; padding: 5px; transition: opacity 0.3s;
         }
         
-        /* A11y Focus States */
         button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
         .panel { 
-            position: absolute; right: 30px; top: 75px; 
+            position: absolute; right: 30px; top: calc(75px + var(--sat, 0px)); 
             background: var(--btn-bg); backdrop-filter: blur(40px);
             -webkit-backdrop-filter: blur(40px); padding: 25px; border-radius: 28px; 
             width: 240px; border: 1px solid rgba(255, 255, 255, 0.1); z-index: 2100;
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            /* Smooth toggle animations */
             opacity: 0; pointer-events: none; transform: translateY(-10px);
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
@@ -80,6 +88,7 @@
             position: absolute; inset: 0; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; 
             transition: opacity 0.5s ease, transform 0.5s ease; padding: 20px;
+            padding-bottom: calc(20px + var(--sab, 0px));
         }
         .hidden { opacity: 0 !important; pointer-events: none; transform: translateY(15px); }
         .back-btn { background: none; border: none; color: var(--accent); margin-bottom: 20px; letter-spacing: 2px; font-size: 11px; }
@@ -88,7 +97,7 @@
         #welcomeScreen { z-index: 3000; background: var(--bg); text-align: center; cursor: pointer; }
         .welcome-title { font-weight: 300; letter-spacing: 14px; text-transform: uppercase; font-size: 2.2rem; margin-bottom: 20px; }
         .welcome-subtitle { font-style: italic; opacity: 0.7; font-weight: 300; max-width: 280px; line-height: 2; margin: 0 auto; }
-        .enter-hint { position: absolute; bottom: 60px; font-size: 9px; letter-spacing: 5px; opacity: 0.4; width: 100%; left: 0; text-align: center; }
+        .enter-hint { position: absolute; bottom: calc(60px + var(--sab, 0px)); font-size: 9px; letter-spacing: 5px; opacity: 0.4; width: 100%; left: 0; text-align: center; }
         .screen-title { font-weight: 300; margin-bottom: 10px; opacity: 0.9; }
 
         /* --- CAROUSEL --- */
@@ -105,21 +114,20 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             cursor: pointer; text-align: center; transition: transform 0.4s ease;
         }
-        .mood-card:hover, .mood-card:focus-visible { transform: scale(1.02); }
+        .mood-card:active { transform: scale(0.96); } /* Mobile tap response */
         .mood-card h3 { font-size: 26px; font-weight: 300; letter-spacing: 1px; margin-bottom: 15px; }
         .mood-card p { font-size: 13px; opacity: 0.6; font-style: italic; max-width: 80%; line-height: 1.6; margin: 0; }
 
-        /* --- VERSE AREA & TYPOGRAPHY --- */
+        /* --- VERSE AREA --- */
         #share-container { padding: 40px; border-radius: 30px; text-align: center; width: 100%; max-width: 500px; box-sizing: border-box; }
         .verse-box { 
             min-height: 180px; margin-bottom: 20px; 
             opacity: 0; transition: opacity 0.4s ease; display: flex; flex-direction: column; justify-content: center;
         }
         .verse-box.show { opacity: 1; }
-        
-        .arabic-text { font-family: 'Amiri', serif; font-size: 32px; line-height: 1.6; margin-bottom: 15px; direction: rtl; font-weight: 700; }
-        .translit-text { font-size: 14px; opacity: 0.7; font-style: italic; margin-bottom: 10px; }
-        .english-text { font-size: 16px; font-weight: 400; line-height: 1.6; }
+        .arabic-text { font-family: 'Amiri', serif; font-size: 32px; line-height: 1.6; margin-bottom: 15px; direction: rtl; font-weight: 700; user-select: text; }
+        .translit-text { font-size: 14px; opacity: 0.7; font-style: italic; margin-bottom: 10px; user-select: text;}
+        .english-text { font-size: 16px; font-weight: 400; line-height: 1.6; user-select: text;}
 
         /* --- BUTTONS --- */
         button { 
@@ -127,14 +135,14 @@
             background: var(--btn-bg); color: var(--text); cursor: pointer; 
             transition: all 0.3s ease; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); outline: none;
         }
-        button:hover { background: rgba(128, 128, 128, 0.3); }
+        button:active { background: rgba(128, 128, 128, 0.4); transform: scale(0.97); }
         .btn-group { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; }
         .btn-row { display: flex; gap: 10px; }
         .action-btn { padding: 18px; font-weight: 600; letter-spacing: 1px; width: 100%; }
         .sub-btn { flex: 1; padding: 14px; font-size: 13px; }
 
         /* --- FAVOURITES SCREEN --- */
-        .fav-scroll-container { justify-content: flex-start; overflow-y: auto; padding-top: 100px; }
+        .fav-scroll-container { justify-content: flex-start; overflow-y: auto; padding-top: calc(100px + var(--sat, 0px)); }
         .fav-title { font-weight: 300; letter-spacing: 3px; text-transform: uppercase; font-size: 16px; margin-bottom: 20px; }
         #favList { width: 100%; max-width: 500px; padding-bottom: 40px; }
         .fav-item { padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
@@ -143,35 +151,46 @@
 
         /* --- TOAST NOTIFICATIONS --- */
         .toast {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: rgba(0, 0, 0, 0.7); color: #fff; padding: 12px 24px; border-radius: 30px;
+            position: fixed; bottom: calc(40px + var(--sab, 0px)); left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8); color: #fff; padding: 12px 24px; border-radius: 30px;
             font-size: 14px; font-weight: 400; z-index: 4000; opacity: 0; pointer-events: none;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); white-space: nowrap;
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        
+        #loading-overlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 5000;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease; pointer-events: none; opacity: 0;
+        }
+        #loading-overlay.active { opacity: 1; pointer-events: all; }
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="deepsea">
 
+<div id="loading-overlay"><div class="spinner"></div></div>
+
 <header id="mainHeader" class="hidden">
-    <div class="brand-link" onclick="showScreen('moodScreen')">Invocation</div>
-    <button class="settings-trigger" aria-label="Settings" onclick="toggleSettings(event)">⚙️</button>
+    <div class="brand-link" onclick="window.showScreen('moodScreen')">Invocation</div>
+    <button class="settings-trigger" aria-label="Settings" onclick="window.toggleSettings(event)">⚙️</button>
     <div id="panel" class="panel">
-        <button class="panel-btn" onclick="viewFavourites()">⭐ Favourites</button>
+        <button class="panel-btn" onclick="window.viewFavourites()">⭐ Favourites</button>
         <div class="theme-header">Themes</div>
         <div class="theme-list">
-            <button onclick="setTheme('deepsea')">Deep Sea</button>
-            <button onclick="setTheme('mist')">Morning Mist</button>
-            <button onclick="setTheme('midnight')">Midnight</button>
-            <button onclick="setTheme('olive')">Olive Grove</button>
-            <button onclick="setTheme('golden')">Golden Hour</button>
+            <button onclick="window.setTheme('deepsea')">Deep Sea</button>
+            <button onclick="window.setTheme('mist')">Morning Mist</button>
+            <button onclick="window.setTheme('midnight')">Midnight</button>
+            <button onclick="window.setTheme('olive')">Olive Grove</button>
+            <button onclick="window.setTheme('golden')">Golden Hour</button>
         </div>
     </div>
 </header>
 
 <!-- Welcome Screen -->
-<div id="welcomeScreen" class="screen" onclick="enterApp()">
+<div id="welcomeScreen" class="screen" onclick="window.enterApp()">
     <h1 class="welcome-title">Invocation</h1>
     <p class="welcome-subtitle">"Whispered du’as for every state of the heart"</p>
     <div class="enter-hint">Tap to enter</div>
@@ -182,35 +201,35 @@
     <h2 class="screen-title">How is your heart?</h2>
     <div class="mood-container">
         <div class="spacer"></div>
-        <button class="mood-card" onclick="startVerses('Anxious')"><h3>Anxious</h3><p>For when the world feels too loud.</p></button>
-        <button class="mood-card" onclick="startVerses('Depressed')"><h3>Depressed</h3><p>For when the light feels distant.</p></button>
-        <button class="mood-card" onclick="startVerses('Lonely')"><h3>Lonely</h3><p>Reminding you He is always near.</p></button>
-        <button class="mood-card" onclick="startVerses('Overwhelmed')"><h3>Overwhelmed</h3><p>Seeking ease within the burden.</p></button>
-        <button class="mood-card" onclick="startVerses('Guilty')"><h3>Ashamed</h3><p>Returning to Infinite Mercy.</p></button>
-        <button class="mood-card" onclick="startVerses('Betrayed')"><h3>Betrayed</h3><p>When only One remains faithful.</p></button>
-        <button class="mood-card" onclick="startVerses('Fearful')"><h3>Fearful</h3><p>Finding courage in His Strength.</p></button>
-        <button class="mood-card" onclick="startVerses('Restless')"><h3>Restless</h3><p>Stillness through remembrance.</p></button>
+        <button class="mood-card" onclick="window.startVerses('Anxious')"><h3>Anxious</h3><p>For when the world feels too loud.</p></button>
+        <button class="mood-card" onclick="window.startVerses('Depressed')"><h3>Depressed</h3><p>For when the light feels distant.</p></button>
+        <button class="mood-card" onclick="window.startVerses('Lonely')"><h3>Lonely</h3><p>Reminding you He is always near.</p></button>
+        <button class="mood-card" onclick="window.startVerses('Overwhelmed')"><h3>Overwhelmed</h3><p>Seeking ease within the burden.</p></button>
+        <button class="mood-card" onclick="window.startVerses('Guilty')"><h3>Ashamed</h3><p>Returning to Infinite Mercy.</p></button>
+        <button class="mood-card" onclick="window.startVerses('Betrayed')"><h3>Betrayed</h3><p>When only One remains faithful.</p></button>
+        <button class="mood-card" onclick="window.startVerses('Fearful')"><h3>Fearful</h3><p>Finding courage in His Strength.</p></button>
+        <button class="mood-card" onclick="window.startVerses('Restless')"><h3>Restless</h3><p>Stillness through remembrance.</p></button>
         <div class="spacer"></div>
     </div>
 </div>
 
 <!-- Verse Display -->
 <div id="verseScreen" class="screen hidden">
-    <button class="back-btn" onclick="showScreen('moodScreen')">← CHANGE MOOD</button>
+    <button class="back-btn" onclick="window.showScreen('moodScreen')">← CHANGE MOOD</button>
     <div id="share-container"><div id="verse" class="verse-box"></div></div>
     <div class="btn-group">
-        <button class="action-btn" onclick="showVerse()">Another Du'a, Please</button>
+        <button class="action-btn" onclick="window.showVerse()">Another Du'a, Please</button>
         <div class="btn-row">
-            <button id="saveBtn" class="sub-btn" onclick="saveFavourite()">Save ⭐</button>
-            <button id="copyBtn" class="sub-btn" onclick="copyVerse()">Copy 📋</button>
-            <button class="sub-btn" onclick="shareAsImage()">Share 📸</button>
+            <button id="saveBtn" class="sub-btn" onclick="window.saveFavourite()">Save ⭐</button>
+            <button id="copyBtn" class="sub-btn" onclick="window.copyVerse()">Copy 📋</button>
+            <button class="sub-btn" onclick="window.shareAsImage()">Share 📸</button>
         </div>
     </div>
 </div>
 
 <!-- Favourites -->
 <div id="favScreen" class="screen hidden fav-scroll-container">
-    <button class="back-btn" onclick="showScreen('moodScreen')">← BACK TO HOME</button>
+    <button class="back-btn" onclick="window.showScreen('moodScreen')">← BACK TO HOME</button>
     <h2 class="fav-title">Saved Du'as</h2>
     <div id="favList"></div>
 </div>
@@ -218,11 +237,34 @@
 <!-- Toast Notification -->
 <div id="toast" class="toast"></div>
 
-<script>
-    // Constants for cleaner code
-    const FAV_KEY = 'inv-favs';
-    const THEME_KEY = 'inv-theme';
+<!-- Backend Logic (Firebase replacing Supabase + PWA Config) -->
+<script type="module">
+    // Firebase Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // --- CAPACITOR SETUP ---
+    const haptics = window.Capacitor?.Plugins?.Haptics;
+    
+    const triggerHaptic = async (style = 'Light') => {
+        if (haptics) {
+            try { await haptics.impact({ style }); } catch(e) {}
+        }
+    };
+
+    // --- FIREBASE CONFIG (Managed Persistence instead of Supabase per rules) ---
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'invocation-app-id';
+    
+    let userId = null;
+    let favoritesList = [];
+    let unsubscribeFavs = null;
+
+    const THEME_KEY = 'inv-theme';
     const moodVerses = {
         Anxious: ["اللهم إني أعوذ بك من الهم والحزن\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.", "حسبي الله لا إله إلا هو عليه توكلت\nḤasbiyallāhu lā ilāha illā Huwa, ‘alayhi tawakkaltu\nAllah is sufficient for me.", "اللهم رحمتك أرجو فلا تكلني إلى نفسي طرفة عين\nAllāhumma raḥmataka arjū fa-lā takilnī ilā nafsī ṭarfata ‘ayn\nO Allah, I hope for Your mercy."],
         Depressed: ["لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\nLā ilāha illā anta subḥānaka innī kuntu minaẓ-ẓālimīn\nThere is no deity except You; glory be to You.", "إِنَّ مَعَ الْعُسْرِ يُسْرًا\nInna ma‘al usri yusra\nIndeed, with hardship comes ease.", "اللَّهُمَّ اشْفِ صَدْرِي\nAllahumma ishfi sadri\nO Allah, heal my heart."],
@@ -237,9 +279,46 @@
     let currentMood = "", lastIdx = -1;
     let toastTimeout;
 
-    // --- UTILITIES ---
+    // --- AUTHENTICATION & SYNC ---
+    const initAuth = async () => {
+        try {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        } catch(e) { console.error("Auth init error:", e); }
+    };
+    initAuth();
 
-    function showToast(message) {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            userId = user.uid;
+            subscribeToFavorites();
+        } else {
+            userId = null;
+            if(unsubscribeFavs) unsubscribeFavs();
+        }
+    });
+
+    const subscribeToFavorites = () => {
+        if (!userId) return;
+        const favRef = collection(db, 'artifacts', appId, 'users', userId, 'favourites');
+        
+        unsubscribeFavs = onSnapshot(favRef, (snapshot) => {
+            favoritesList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            // Refresh view if currently open
+            if(!document.getElementById('favScreen').classList.contains('hidden')) {
+                window.viewFavourites();
+            }
+        }, (error) => {
+            console.error("Error fetching favorites:", error);
+        });
+    };
+
+    // --- UTILITIES ---
+    window.showToast = (message) => {
+        triggerHaptic('Light');
         const toast = document.getElementById('toast');
         toast.innerText = message;
         toast.classList.add('show');
@@ -247,18 +326,6 @@
         toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Safely parse LocalStorage
-    function getFavs() {
-        try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } 
-        catch (e) { return []; }
-    }
-
-    function saveFavsToLocal(favArray) {
-        try { localStorage.setItem(FAV_KEY, JSON.stringify(favArray)); } 
-        catch (e) { console.error('Error saving to localStorage', e); }
-    }
-
-    // Parses 3-line string into structured HTML
     function formatVerse(text) {
         const parts = text.split('\n');
         if(parts.length === 3) {
@@ -266,12 +333,12 @@
                     <div class="translit-text">${parts[1]}</div>
                     <div class="english-text">${parts[2]}</div>`;
         }
-        return `<div class="english-text">${text}</div>`; // Fallback
+        return `<div class="english-text">${text}</div>`;
     }
 
     // --- NAVIGATION ---
-
-    function enterApp() { 
+    window.enterApp = () => { 
+        triggerHaptic('Medium');
         document.getElementById('welcomeScreen').classList.add('hidden'); 
         setTimeout(() => { 
             document.getElementById('welcomeScreen').style.display = 'none'; 
@@ -280,21 +347,22 @@
         }, 500); 
     }
 
-    function showScreen(id) { 
+    window.showScreen = (id) => { 
+        triggerHaptic('Light');
         document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); 
         document.getElementById('panel').classList.remove('show'); 
         document.getElementById(id).classList.remove('hidden'); 
     }
 
     // --- CORE LOGIC ---
-
-    function startVerses(mood) { 
+    window.startVerses = (mood) => { 
         currentMood = mood; 
-        showScreen('verseScreen'); 
-        showVerse(); 
+        window.showScreen('verseScreen'); 
+        window.showVerse(); 
     }
     
-    function showVerse() { 
+    window.showVerse = () => { 
+        triggerHaptic('Light');
         const v = document.getElementById('verse'); 
         const list = moodVerses[currentMood]; 
         let idx; 
@@ -303,98 +371,103 @@
         
         v.classList.remove('show'); 
         setTimeout(() => { 
-            v.dataset.rawText = list[idx]; // Store raw text for copying/saving
+            v.dataset.rawText = list[idx];
             v.innerHTML = formatVerse(list[idx]);
             v.classList.add('show'); 
         }, 200); 
     }
     
-    function saveFavourite() {
-        let favs = getFavs();
-        const rawText = document.getElementById('verse').dataset.rawText;
+    window.saveFavourite = async () => {
+        if (!userId) return window.showToast("Authenticating... please wait.");
+        triggerHaptic('Medium');
         
-        if(!favs.includes(rawText)) {
-            favs.push(rawText);
-            saveFavsToLocal(favArray = favs);
-            showToast("Saved to Favourites ⭐");
-        } else { 
-            showToast("Already in Favourites");
+        const rawText = document.getElementById('verse').dataset.rawText;
+        if(favoritesList.find(f => f.rawText === rawText)) {
+            return window.showToast("Already in Favourites");
+        }
+
+        try {
+            document.getElementById('loading-overlay').classList.add('active');
+            const favRef = collection(db, 'artifacts', appId, 'users', userId, 'favourites');
+            const newDocRef = doc(favRef);
+            await setDoc(newDocRef, { rawText, timestamp: Date.now() });
+            window.showToast("Saved to Favourites ⭐");
+        } catch (e) {
+            window.showToast("Failed to save");
+            console.error(e);
+        } finally {
+            document.getElementById('loading-overlay').classList.remove('active');
         }
     }
 
-    function viewFavourites() {
+    window.viewFavourites = () => {
+        triggerHaptic('Light');
         const screen = document.getElementById('favScreen'); 
         screen.scrollTo(0,0);
         const list = document.getElementById('favList');
-        const favs = getFavs();
         
-        list.innerHTML = favs.length ? "" : "<p class='empty-favs'>No saved du'as yet.</p>";
+        list.innerHTML = favoritesList.length ? "" : "<p class='empty-favs'>No saved du'as yet.</p>";
         
-        [...favs].reverse().forEach((f, i) => {
+        // Sort by newest first
+        const sortedFavs = [...favoritesList].sort((a,b) => b.timestamp - a.timestamp);
+
+        sortedFavs.forEach((f) => {
             const d = document.createElement('div'); 
             d.className = "fav-item";
             d.innerHTML = `
-                ${formatVerse(f)}
-                <button class="remove-btn" onclick="removeFav(${favs.length-1-i})">REMOVE</button>
+                ${formatVerse(f.rawText)}
+                <button class="remove-btn" onclick="window.removeFav('${f.id}')">REMOVE</button>
             `;
             list.appendChild(d);
         });
-        showScreen('favScreen');
+        window.showScreen('favScreen');
     }
 
-    function removeFav(i) { 
-        let favs = getFavs(); 
-        favs.splice(i, 1); 
-        saveFavsToLocal(favs); 
-        viewFavourites(); 
-        showToast("Removed from Favourites");
-    }
-
-    function copyVerse() { 
-        const textToCopy = document.getElementById('verse').dataset.rawText;
-        
-        // Robust clipboard fallback
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showToast("Copied to clipboard 📋");
-            }).catch(err => {
-                fallbackCopyTextToClipboard(textToCopy);
-            });
-        } else {
-            fallbackCopyTextToClipboard(textToCopy);
+    window.removeFav = async (id) => { 
+        if (!userId) return;
+        triggerHaptic('Heavy');
+        try {
+            await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'favourites', id));
+            window.showToast("Removed from Favourites");
+        } catch (e) {
+            console.error(e);
         }
     }
 
-    function fallbackCopyTextToClipboard(text) {
-        var textArea = document.createElement("textarea");
-        textArea.value = text;
+    window.copyVerse = () => { 
+        triggerHaptic('Light');
+        const textToCopy = document.getElementById('verse').dataset.rawText;
+        
+        // Use document.execCommand for isolated environments/iframes
+        const textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
         textArea.style.position = "fixed";
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
         try {
             document.execCommand('copy');
-            showToast("Copied to clipboard 📋");
+            window.showToast("Copied to clipboard 📋");
         } catch (err) {
-            showToast("Failed to copy");
+            window.showToast("Failed to copy");
         }
         document.body.removeChild(textArea);
     }
 
     // --- SETTINGS & EXTRAS ---
-
-    function setTheme(t) { 
+    window.setTheme = (t) => { 
+        triggerHaptic('Light');
         document.body.className = t; 
         try { localStorage.setItem(THEME_KEY, t); } catch(e) {}
     }
 
-    function toggleSettings(event) { 
-        event.stopPropagation(); // Prevent immediate close trigger
+    window.toggleSettings = (event) => { 
+        triggerHaptic('Light');
+        event.stopPropagation(); 
         const p = document.getElementById('panel'); 
         p.classList.toggle('show');
     }
 
-    // Click outside to close panel
     document.addEventListener('click', (e) => {
         const panel = document.getElementById('panel');
         if (panel.classList.contains('show') && !panel.contains(e.target)) {
@@ -402,14 +475,14 @@
         }
     });
 
-    function shareAsImage() { 
+    window.shareAsImage = () => { 
+        triggerHaptic('Medium');
         const container = document.getElementById('share-container'); 
         const originalBg = container.style.background; 
         
-        // Temporarily apply body background to container for image render
         container.style.background = getComputedStyle(document.body).backgroundImage; 
+        window.showToast("Preparing image...");
         
-        showToast("Preparing image...");
         html2canvas(container, { backgroundColor: null, scale: 2 }).then(canvas => { 
             const link = document.createElement('a'); 
             link.download = `Invocation-${currentMood}.png`; 
@@ -417,23 +490,66 @@
             link.click(); 
             container.style.background = originalBg; 
         }).catch(() => {
-            showToast("Could not generate image");
+            window.showToast("Could not generate image");
             container.style.background = originalBg; 
         }); 
     }
 
-    // Initialization
+    // --- INIT ---
     window.onload = () => {
         let savedTheme = 'deepsea';
         try { savedTheme = localStorage.getItem(THEME_KEY) || 'deepsea'; } catch(e) {}
-        setTheme(savedTheme);
+        window.setTheme(savedTheme);
     };
 
-    // --- PWA SERVICE WORKER REGISTRATION ---
+    // --- DYNAMIC PWA GENERATION (For Single File Compatibility) ---
+    // In a real project, this manifest is in 'manifest.json'
+    const manifestJson = {
+        "name": "Invocation",
+        "short_name": "Invocation",
+        "start_url": ".",
+        "display": "standalone",
+        "background_color": "#09203f",
+        "theme_color": "#09203f",
+        "description": "Whispered du’as for every state of the heart",
+        "icons": [{
+            "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2309203f'/><text x='50%' y='50%' font-size='40' font-family='sans-serif' fill='white' text-anchor='middle' dy='.3em'>I</text></svg>",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }]
+    };
+    
+    const manifestBlob = new Blob([JSON.stringify(manifestJson)], {type: 'application/json'});
+    const manifestUrl = URL.createObjectURL(manifestBlob);
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = manifestUrl;
+    document.head.appendChild(manifestLink);
+
+    // In a real project, this logic is inside 'sw.js'
+    const swCode = `
+        const CACHE_NAME = 'invocation-v1';
+        self.addEventListener('install', e => {
+            self.skipWaiting();
+        });
+        self.addEventListener('activate', e => {
+            e.waitUntil(clients.claim());
+        });
+        self.addEventListener('fetch', e => {
+            if(e.request.method !== 'GET' || e.request.url.includes('firestore')) return;
+            e.respondWith(
+                caches.match(e.request).then(res => res || fetch(e.request))
+            );
+        });
+    `;
+    const swBlob = new Blob([swCode], {type: 'application/javascript'});
+    const swUrl = URL.createObjectURL(swBlob);
+    
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').catch(err => {
-                console.log('SW Registration failed:', err);
+            navigator.serviceWorker.register(swUrl).catch(err => {
+                console.log('SW Registration fallback active.');
             });
         });
     }
