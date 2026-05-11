@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Invocation | Spiritual Du'as</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         :root {
@@ -20,6 +23,7 @@
             --sab: env(safe-area-inset-bottom, 0px);
         }
 
+        /* Themes matching the exact source */
         body.deepsea { --bg: linear-gradient(135deg, #09203f 0%, #537895 100%); --text: #ffffff; --accent: #00d2ff; }
         body.mist { --bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); --text: #1f2937; --accent: #2563eb; --btn-bg: rgba(0, 0, 0, 0.06); --card-bg: rgba(0, 0, 0, 0.04); }
         body.midnight { --bg: linear-gradient(135deg, #0f1115 0%, #1a1d23 100%); --text: #e6e6e6; --accent: #6ee7ff; --btn-bg: rgba(255, 255, 255, 0.06); --card-bg: rgba(255, 255, 255, 0.04); }
@@ -40,11 +44,12 @@
             font-family: 'Inter', sans-serif; 
             color: var(--text); 
             background: var(--bg);
-            transition: background 0.6s ease; 
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
             display: flex;
             flex-direction: column;
         }
 
+        /* Header Navigation */
         header {
             position: absolute; top: 0; left: 0; right: 0;
             padding: calc(20px + var(--sat)) 25px 15px; 
@@ -58,64 +63,80 @@
         .brand { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; opacity: 0.6; cursor: pointer; }
         .settings-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: inherit; padding: 8px; }
 
+        /* Settings Panel Overlay */
         .panel { 
             position: absolute; right: 25px; top: calc(75px + var(--sat)); 
-            background: var(--btn-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            padding: 20px; border-radius: 24px; width: 240px; border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: var(--btn-bg); backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px);
+            padding: 20px; border-radius: 28px; width: 240px; border: 1px solid rgba(255, 255, 255, 0.1); 
             z-index: 2100; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: 0.3s ease;
         }
         .panel.active { opacity: 1; visibility: visible; transform: translateY(0); }
         .panel-btn { width: 100%; padding: 12px; margin-bottom: 6px; border-radius: 12px; font-size: 13px; text-align: left; background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
 
+        /* Screen Management */
         .screen { 
             position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; visibility: hidden; transition: opacity 0.4s ease, transform 0.4s ease; 
-            transform: scale(0.98);
+            opacity: 0; visibility: hidden; transition: 0.4s ease; 
+            transform: scale(0.96);
             padding: 20px; padding-top: calc(80px + var(--sat)); padding-bottom: calc(20px + var(--sab));
             z-index: 500;
+            pointer-events: none;
         }
-        .screen.active { opacity: 1; visibility: visible; transform: scale(1); }
+        .screen.active { opacity: 1; visibility: visible; transform: scale(1); pointer-events: auto; }
         .screen-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; display: block; }
 
+        /* Welcome Landing */
         #welcomeScreen { z-index: 3000; padding-top: 0; cursor: pointer; }
-        .welcome-title { font-weight: 300; letter-spacing: 12px; text-transform: uppercase; font-size: 2rem; margin-bottom: 20px; text-align: center; }
+        .welcome-title { font-weight: 300; letter-spacing: 12px; text-transform: uppercase; font-size: 2.2rem; margin-bottom: 20px; text-align: center; }
         .welcome-subtitle { font-style: italic; opacity: 0.6; line-height: 1.8; font-size: 15px; text-align: center; max-width: 280px; }
 
+        /* Mood Selection Swiper */
         .mood-container { width: 100%; overflow-x: auto; display: flex; scroll-snap-type: x mandatory; padding: 40px 0; scrollbar-width: none; }
         .mood-container::-webkit-scrollbar { display: none; }
         .mood-card {
-            flex: 0 0 75vw; height: 380px; margin: 0 10px; background: var(--card-bg); 
+            flex: 0 0 78vw; height: 380px; margin: 0 12px; background: var(--card-bg); 
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 40px; 
             scroll-snap-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; cursor: pointer;
+            text-align: center; cursor: pointer; transition: transform 0.3s;
         }
-        .mood-card h3 { font-size: 26px; font-weight: 300; margin-bottom: 10px; }
-        .mood-card p { font-size: 12px; opacity: 0.5; font-style: italic; padding: 0 30px; }
+        .mood-card:active { transform: scale(0.97); }
+        .mood-card h3 { font-size: 28px; font-weight: 300; margin-bottom: 10px; }
+        .mood-card p { font-size: 13px; opacity: 0.5; font-style: italic; padding: 0 35px; line-height: 1.5; }
 
-        .back-nav { background: none; border: none; color: var(--accent); margin-bottom: 20px; letter-spacing: 3px; font-size: 10px; cursor: pointer; text-transform: uppercase; font-weight: 600; padding: 10px; }
+        /* Navigation Buttons */
+        .back-nav { background: none; border: none; color: var(--accent); margin-bottom: 20px; letter-spacing: 3px; font-size: 10px; cursor: pointer; text-transform: uppercase; font-weight: 600; padding: 12px; width: fit-content; align-self: center; }
 
-        .arabic { font-family: 'Amiri', serif; font-size: clamp(24px, 6vw, 32px); line-height: 2; margin-bottom: 15px; direction: rtl; text-align: center; }
-        .translit { font-size: 14px; opacity: 0.6; font-style: italic; margin-bottom: 10px; text-align: center; line-height: 1.5; }
-        .translation { font-size: 17px; line-height: 1.6; text-align: center; }
+        /* Verse Typography */
+        .arabic { font-family: 'Amiri', serif; font-size: clamp(26px, 7vw, 36px); line-height: 1.9; margin-bottom: 20px; direction: rtl; text-align: center; padding: 0 10px; }
+        .translit { font-size: 14px; opacity: 0.5; font-style: italic; margin-bottom: 12px; text-align: center; line-height: 1.6; padding: 0 25px; }
+        .translation { font-size: 18px; line-height: 1.6; text-align: center; padding: 0 25px; font-weight: 300; }
 
-        .btn-stack { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
+        /* Action Buttons */
+        .btn-stack { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; margin-top: 35px; }
         .main-btn { padding: 18px; border-radius: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; background: var(--btn-bg); color: inherit; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
+        .main-btn:active { background: rgba(255,255,255,0.2); }
         .sub-btn-row { display: flex; gap: 8px; }
-        .icon-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 10px; text-transform: uppercase; background: var(--btn-bg); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .icon-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 10px; text-transform: uppercase; background: var(--btn-bg); color: inherit; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-weight: 600; letter-spacing: 1px; }
 
-        .list-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 500px; padding-bottom: 40px; }
-        .list-item { padding: 25px; border-radius: 24px; background: var(--btn-bg); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; text-align: center; }
+        /* Protection & List Items */
+        .list-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 500px; padding-bottom: 40px; margin: 0 auto; }
+        .list-item { padding: 25px; border-radius: 28px; background: var(--btn-bg); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; text-align: center; transition: background 0.3s; }
+        .list-item:active { background: rgba(255,255,255,0.2); }
+        .list-item h4 { font-size: 14px; margin-bottom: 4px; letter-spacing: 1px; }
+        .list-item p { font-size: 11px; opacity: 0.5; font-style: italic; }
 
+        /* Feedback UI */
         .toast {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: rgba(0,0,0,0.85); color: white; padding: 12px 24px; border-radius: 30px;
-            font-size: 11px; transition: 0.4s; opacity: 0; z-index: 9000; pointer-events: none;
+            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(0,0,0,0.85); color: white; padding: 14px 28px; border-radius: 30px;
+            font-size: 11px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; z-index: 9000; pointer-events: none; letter-spacing: 1px;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        #loader { position: fixed; inset: 0; background: #09203f; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: 0.5s; pointer-events: none; }
-        .spinner { width: 30px; height: 30px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        /* Loader Overlay */
+        #loader { position: fixed; inset: 0; background: #09203f; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: 0.6s; pointer-events: none; }
+        .spinner { width: 35px; height: 35px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -125,64 +146,62 @@
 
 <header id="appHeader">
     <div class="brand" onclick="navigate('moodScreen')">Invocation</div>
-    <button class="settings-btn" onclick="togglePanel(event)">⚙️</button>
+    <button class="settings-btn" id="triggerSettings">⚙️</button>
     <div id="settingsPanel" class="panel">
-        <button class="panel-btn" onclick="navigate('favScreen')">⭐ Favourites</button>
-        <button class="panel-btn" onclick="navigate('protectScreen')">🛡️ Protection</button>
+        <button class="panel-btn" onclick="navigate('favScreen')">Favourites</button>
+        <button class="panel-btn" onclick="navigate('protectScreen')">Protection</button>
         <div style="font-size: 9px; opacity: 0.4; letter-spacing: 2px; margin: 15px 5px 5px;">THEMES</div>
         <button class="panel-btn" onclick="setTheme('deepsea')">Deep Sea</button>
         <button class="panel-btn" onclick="setTheme('mist')">Mist</button>
         <button class="panel-btn" onclick="setTheme('midnight')">Midnight</button>
         <button class="panel-btn" onclick="setTheme('golden')">Golden Hour</button>
+        <button class="panel-btn" onclick="setTheme('olive')">Olive Grove</button>
     </div>
 </header>
 
-<div id="welcomeScreen" class="screen active" onclick="enterApp()">
+<!-- Landing Page -->
+<div id="welcomeScreen" class="screen active">
     <h1 class="welcome-title">Invocation</h1>
     <p class="welcome-subtitle">Healing du’as for the restless heart</p>
-    <p style="font-size: 9px; margin-top: 50px; letter-spacing: 3px; opacity: 0.5;">TAP TO START</p>
+    <p style="font-size: 10px; margin-top: 50px; letter-spacing: 4px; opacity: 0.4; font-weight: 600;">TAP TO START</p>
 </div>
 
+<!-- Category Selection -->
 <div id="moodScreen" class="screen">
-    <h2 style="font-weight: 300; margin-bottom: 20px; opacity: 0.8;">How is your heart?</h2>
-    <div class="mood-container">
-        <div style="flex: 0 0 10vw;"></div>
-        <div class="mood-card" onclick="openState('Anxious')"><h3>Anxious</h3><p>When the world feels too loud.</p></div>
-        <div class="mood-card" onclick="openState('Depressed')"><h3>Depressed</h3><p>When the light feels distant.</p></div>
-        <div class="mood-card" onclick="openState('Lonely')"><h3>Lonely</h3><p>Reminding you He is near.</p></div>
-        <div class="mood-card" onclick="openState('Overwhelmed')"><h3>Overwhelmed</h3><p>Seeking ease in the burden.</p></div>
-        <div class="mood-card" onclick="openState('Ashamed')"><h3>Ashamed</h3><p>Returning to Infinite Mercy.</p></div>
-        <div style="flex: 0 0 10vw;"></div>
-    </div>
+    <h2 style="font-weight: 300; margin-bottom: 25px; opacity: 0.8; font-size: 1.2rem; letter-spacing: 1px;">How is your heart?</h2>
+    <div class="mood-container" id="moodGrid"></div>
 </div>
 
+<!-- Protection Library (Exact Mirror) -->
 <div id="protectScreen" class="screen screen-scroll">
-    <div style="max-width: 500px; width: 100%; margin: 0 auto; padding: 20px;">
-        <button class="back-nav" onclick="navigate('moodScreen')">← Back</button>
-        <h2 style="font-weight: 300; margin-bottom: 30px; text-align: center;">Shield & Safety</h2>
+    <div style="max-width: 500px; width: 100%; margin: 0 auto; padding: 20px; display: flex; flex-direction: column;">
+        <button class="back-nav" onclick="goBack()">← Back</button>
+        <h2 style="font-weight: 300; margin-bottom: 30px; text-align: center; letter-spacing: 1px;">Shield & Safety</h2>
         <div id="protectList" class="list-stack"></div>
     </div>
 </div>
 
+<!-- Verse Viewer -->
 <div id="verseScreen" class="screen">
-    <button id="verseBack" class="back-nav">← Back</button>
-    <div id="shareArea" style="padding: 20px; border-radius: 30px; width: 100%; max-width: 500px;">
+    <button class="back-nav" onclick="goBack()">← Back</button>
+    <div id="shareArea" style="padding: 25px; border-radius: 40px; width: 100%; max-width: 450px;">
         <div id="verseContent"></div>
     </div>
     <div class="btn-stack">
         <button id="nextBtn" class="main-btn" onclick="nextVerse()">Next Du'a</button>
         <div class="sub-btn-row">
-            <button class="icon-btn" onclick="saveFav()">Save ⭐</button>
-            <button class="icon-btn" onclick="copyVerse()">Copy 📋</button>
-            <button class="icon-btn" onclick="snap()">Share 📸</button>
+            <button class="icon-btn" onclick="saveFav()">Save</button>
+            <button class="icon-btn" onclick="copyVerse()">Copy</button>
+            <button class="icon-btn" onclick="snap()">Share</button>
         </div>
     </div>
 </div>
 
+<!-- Favourites -->
 <div id="favScreen" class="screen screen-scroll">
-    <div style="max-width: 500px; width: 100%; margin: 0 auto; padding: 20px;">
-        <button class="back-nav" onclick="navigate('moodScreen')">← Back</button>
-        <h2 style="font-weight: 300; margin-bottom: 30px; text-align: center;">Favourites</h2>
+    <div style="max-width: 500px; width: 100%; margin: 0 auto; padding: 20px; display: flex; flex-direction: column;">
+        <button class="back-nav" onclick="goBack()">← Back</button>
+        <h2 style="font-weight: 300; margin-bottom: 30px; text-align: center; letter-spacing: 1px;">Favourites</h2>
         <div id="favList" class="list-stack"></div>
     </div>
 </div>
@@ -190,110 +209,180 @@
 <div id="toast" class="toast"></div>
 
 <script>
+    // Exact data dictionary from source
     const dbData = {
-        Anxious: ["اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.", "حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ\nḤasbiyallāhu lā ilāha illā Huwa ‘alayhi tawakkaltu\nAllah is sufficient for me; there is no deity except Him."],
-        Depressed: ["لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\nLā ilāha illā anta subḥānaka innī kuntu min al-ẓālimīn\nThere is no deity except You; glory be to You. I have been of the wrongdoers."],
-        Lonely: ["اللَّهُمَّ آنِسْ وَحْشَتِي\nAllāhumma ānis waḥshatī\nO Allah, comfort my loneliness."],
-        Overwhelmed: ["رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي\nRabbi-shraḥ lī ṣadrī wa yassir lī amrī\nMy Lord, expand for me my chest and ease for me my task."],
-        Ashamed: ["لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ\nLā taqnaṭū min raḥmatillāh\nDo not despair of the mercy of Allah."],
-        EvilEye: ["أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ\nA‘ūdhu bi-kalimātillāhit-tāmmah min kulli shayṭān\nI seek refuge in the perfect words of Allah from every devil."],
-        Healing: ["اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَاسَ اشْفِ أَنْتَ الشَّافِي\nAllāhumma rabban-nāsi adhhibil-ba’sash-fi antash-shāfī\nO Allah, Lord of mankind, remove the harm and heal."],
-        SpiritualAttacks: ["أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ\nA‘ūdhu billāhi minash-shayṭānir-rajīm\nI seek refuge in Allah from the accursed devil."]
+        Anxious: [
+            "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ\nAllāhumma innī a‘ūdhu bika min al-hammi wal-ḥazan\nO Allah, I seek refuge in You from anxiety and sorrow.",
+            "حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ\nḤasbiyallāhu lā ilāha illā Huwa ‘alayhi tawakkaltu\nAllah is sufficient for me; there is no deity except Him.",
+            "لَا إِلَهَ إِلَّا اللهُ الْحَلِيمُ الْكَرِيمُ\nLā ilāha illallāhul-Ḥalīmul-Karīm\nThere is no deity but Allah, the Forbearing, the Generous."
+        ],
+        Depressed: [
+            "لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ\nLā ilāha illā anta subḥānaka innī kuntu min al-ẓālimīn\nThere is no deity except You; glory be to You. I have been of the wrongdoers.",
+            "إِنَّمَا أَشْكُو بَثِّي وَحُزْنِي إِلَى اللَّهِ\nInnamā ashkū baththī wa ḥuznī ilallāh\nI only complain of my suffering and my grief to Allah."
+        ],
+        Lonely: [
+            "اللَّهُمَّ آنِسْ وَحْشَتِي\nAllāhumma ānis waḥshatī\nO Allah, comfort my loneliness.",
+            "وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ\nWa huwa ma‘akum ayna mā kuntum\nAnd He is with you wherever you are."
+        ],
+        Overwhelmed: [
+            "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي\nRabbi-shraḥ lī ṣadrī wa yassir lī amrī\nMy Lord, expand for me my chest and ease for me my task.",
+            "اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا\nAllāhumma lā sahla illā mā ja‘altahu sahlā\nO Allah, there is nothing easy except what You make easy."
+        ],
+        Ashamed: [
+            "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ\nLā taqnaṭū min raḥmatillāh\nDo not despair of the mercy of Allah.",
+            "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي\nAllāhumma innaka ‘Afuwwun tuḥibbul-‘afwa fa‘fu ‘annī\nO Allah, You are Forgiving and love forgiveness, so forgive me."
+        ],
+        Angry: [
+            "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ\nA‘ūdhu billāhi minash-shayṭānir-rajīm\nI seek refuge in Allah from the accursed devil.",
+            "اللَّهُمَّ اغْفِرْ لِي ذَنْبِي وَأَذْهِبْ غَيْظَ قَلْبِي\nAllāhumma-ghfir lī dhanbī wa adh-hib ghayẓa qalbī\nO Allah, forgive my sin and take away the anger of my heart."
+        ],
+        Grieving: [
+            "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ\nInnā lillāhi wa innā ilayhi rāji‘ūn\nIndeed, we belong to Allah, and indeed to Him we will return."
+        ],
+        Doubtful: [
+            "آمَنْتُ بِاللَّهِ وَرُسُلِهِ\nĀmantu billāhi wa rusulih\nI believe in Allah and His Messengers."
+        ],
+        // Protection Data
+        GeneralProtect: ["حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ\nḤasbiyallāhu lā ilāha illā Huwa ‘alayhi tawakkaltu\nAllah is sufficient for me; there is no deity except Him. In Him I trust."],
+        EvilEye: ["أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ\nA‘ūdhu bi-kalimātillāhit-tāmmāti min sharri mā khalaq\nI seek refuge in the perfect words of Allah from the evil of what He has created."],
+        DailyShield: ["بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ\nBismillāhil-ladhī lā yaḍurru ma‘as-mihi shay’un fil-arḍi wal-samā’\nIn the name of Allah, with Whose name nothing is harmed on earth nor in heaven."],
+        SleepSafety: ["اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا\nAllāhumma bi-asmika amūtu wa aḥyā\nO Allah, in Your name I die and I live."],
+        ProtectKids: ["أُعِيذُكُمَا بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ\nU‘īdhukumā bi-kalimātillāhit-tāmmah min kulli shayṭān\nI seek protection for you in the perfect words of Allah from every devil."],
+        AgainstFear: ["اللَّهُمَّ اكْفِنِيهِمْ بِمَا شِئْتَ\nAllāhumma-kfinīhim bimā shi’t\nO Allah, suffice me against them however You wish."],
+        HealingBody: ["أَذْهِبِ الْبَاسَ رَبَّ النَّاسِ وَاشْفِ أَنْتَ الشَّافِي\nAdh-hibil-ba’sa Rabban-nāsi wa-shfi Antash-Shāfī\nRemove the harm, O Lord of mankind, and heal, for You are the Healer."]
     };
 
+    const moodCards = [
+        { id: 'Anxious', title: 'Anxious', desc: 'When the world feels too loud.' },
+        { id: 'Depressed', title: 'Depressed', desc: 'When the light feels distant.' },
+        { id: 'Lonely', title: 'Lonely', desc: 'Reminding you He is near.' },
+        { id: 'Overwhelmed', title: 'Overwhelmed', desc: 'Seeking ease in the burden.' },
+        { id: 'Ashamed', title: 'Ashamed', desc: 'Returning to Infinite Mercy.' },
+        { id: 'Angry', title: 'Angry', desc: 'Quieting the fire within.' },
+        { id: 'Grieving', title: 'Grieving', desc: 'Finding peace in loss.' },
+        { id: 'Doubtful', title: 'Doubtful', desc: 'Seeking clarity and firm faith.' }
+    ];
+
     const protectionLibrary = [
-        { id: 'EvilEye', name: 'Evil Eye', desc: 'Protection from jealousy.' },
-        { id: 'Healing', name: 'Healing', desc: 'For body and spirit.' },
-        { id: 'SpiritualAttacks', name: 'Spiritual Shield', desc: 'Protection from unseen harm.' }
+        { id: 'GeneralProtect', icon: '🛡️', name: 'General Protection', desc: 'A shield for all affairs.' },
+        { id: 'EvilEye', icon: '🧿', name: 'Evil Eye', desc: 'From envy and hidden harm.' },
+        { id: 'DailyShield', icon: '☀️', name: 'Morning and Evening', desc: 'Daily safety for the soul.' },
+        { id: 'SleepSafety', icon: '🌙', name: 'Before Sleep', desc: 'Rest under Divine protection.' },
+        { id: 'ProtectKids', icon: '👶', name: 'For Children', desc: 'A prayer for their safety.' },
+        { id: 'AgainstFear', icon: '🤺', name: 'Against Fear', desc: 'Calming the heart from threats.' },
+        { id: 'HealingBody', icon: '🤲', name: 'Physical Healing', desc: 'Seeking health and recovery.' }
     ];
 
     let state = {
         currentMood: '',
-        currentVerse: ''
+        currentVerse: '',
+        history: ['welcomeScreen']
     };
 
-    const setVh = () => {
-        document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
-    };
-    window.addEventListener('resize', setVh);
-    setVh();
+    const haptic = () => { if (window.navigator.vibrate) window.navigator.vibrate(10); };
 
     const showToast = (msg) => {
         const t = document.getElementById('toast');
         t.innerText = msg;
         t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2500);
+        setTimeout(() => t.classList.remove('show'), 2000);
     };
 
     const navigate = (screenId) => {
+        haptic();
         document.getElementById('settingsPanel').classList.remove('active');
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
         
+        if (state.history[state.history.length - 1] !== screenId) {
+            state.history.push(screenId);
+        }
+
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(screenId);
+        if (target) target.classList.add('active');
+
         const header = document.getElementById('appHeader');
-        if (screenId === 'welcomeScreen') header.classList.remove('visible');
-        else header.classList.add('visible');
+        if (screenId === 'welcomeScreen') {
+            header.classList.remove('visible');
+            state.history = ['welcomeScreen']; 
+        } else {
+            header.classList.add('visible');
+        }
 
         if (screenId === 'favScreen') renderFavs();
     };
 
-    const enterApp = () => navigate('moodScreen');
-
-    const togglePanel = (e) => {
-        e.stopPropagation();
-        document.getElementById('settingsPanel').classList.toggle('active');
+    const goBack = () => {
+        if (state.history.length <= 1) return;
+        state.history.pop();
+        const prevScreen = state.history[state.history.length - 1];
+        
+        haptic();
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(prevScreen);
+        if (target) target.classList.add('active');
+        
+        if (prevScreen === 'welcomeScreen') {
+            document.getElementById('appHeader').classList.remove('visible');
+        }
     };
 
-    const openState = (mood) => {
-        state.currentMood = mood;
-        const isProtection = protectionLibrary.some(p => p.id === mood);
-        document.getElementById('verseBack').onclick = () => navigate(isProtection ? 'protectScreen' : 'moodScreen');
-        document.getElementById('nextBtn').style.display = (dbData[mood] || []).length > 1 ? 'block' : 'none';
+    const openState = (moodId) => {
+        state.currentMood = moodId;
+        const pool = dbData[moodId] || [];
+        document.getElementById('nextBtn').style.display = pool.length > 1 ? 'block' : 'none';
         navigate('verseScreen');
         nextVerse();
     };
 
     const nextVerse = () => {
         const pool = dbData[state.currentMood];
-        if (!pool) return;
-        state.currentVerse = pool[Math.floor(Math.random() * pool.length)];
-        const [ar, tr, en] = state.currentVerse.split('\n');
+        if (!pool || pool.length === 0) return;
+        
+        haptic();
+        let nextV;
+        if (pool.length === 1) {
+            nextV = pool[0];
+        } else {
+            do {
+                nextV = pool[Math.floor(Math.random() * pool.length)];
+            } while (nextV === state.currentVerse && pool.length > 1);
+        }
+        
+        state.currentVerse = nextV;
+        const lines = state.currentVerse.split('\n');
+        
         document.getElementById('verseContent').innerHTML = `
-            <div class="arabic">${ar}</div>
-            <div class="translit">${tr}</div>
-            <div class="translation">${en}</div>
+            <div class="arabic">${lines[0] || ''}</div>
+            <div class="translit">${lines[1] || ''}</div>
+            <div class="translation">${lines[2] || ''}</div>
         `;
     };
 
     const saveFav = () => {
         let favs = JSON.parse(localStorage.getItem('invocation_favs') || '[]');
-        if (favs.some(v => v.text === state.currentVerse)) return showToast("Already saved");
-        
-        favs.push({ 
-            id: Date.now().toString(), 
-            text: state.currentVerse, 
-            mood: state.currentMood 
-        });
+        if (favs.some(v => v.text === state.currentVerse)) {
+            showToast("Already saved to Favourites");
+            return;
+        }
+        favs.push({ id: Date.now().toString(), text: state.currentVerse, mood: state.currentMood });
         localStorage.setItem('invocation_favs', JSON.stringify(favs));
-        showToast("Saved to Favourites ⭐");
+        showToast("Saved to Favourites");
     };
 
     const renderFavs = () => {
         const list = document.getElementById('favList');
         const items = JSON.parse(localStorage.getItem('invocation_favs') || '[]');
-        
         if (!items.length) {
-            list.innerHTML = "<p style='opacity:0.4; text-align:center; padding: 40px;'>No saved du'as yet.</p>";
+            list.innerHTML = "<p style='opacity:0.4; text-align:center; padding: 60px; font-size: 13px; font-style: italic;'>No saved du'as yet.</p>";
             return;
         }
-
         list.innerHTML = items.map(f => {
             const p = f.text.split('\n');
             return `
                 <div class="list-item">
-                    <div class="arabic" style="font-size:22px;">${p[0]}</div>
-                    <div class="translation" style="font-size:13px; margin-top:10px;">${p[2]}</div>
-                    <button style="background:none; border:none; color:#ff6b6b; font-size:10px; margin-top:15px; cursor:pointer;" onclick="deleteFav('${f.id}')">REMOVE</button>
+                    <div class="arabic" style="font-size:20px; line-height: 1.6;">${p[0]}</div>
+                    <div class="translation" style="font-size:14px; margin-top:10px;">${p[2]}</div>
+                    <button style="background:none; border:none; color:#ff6b6b; font-size:9px; margin-top:20px; cursor:pointer; letter-spacing: 2px; font-weight: 600;" onclick="deleteFav('${f.id}')">REMOVE DU'A</button>
                 </div>
             `;
         }).join('');
@@ -304,64 +393,97 @@
         favs = favs.filter(f => f.id !== id);
         localStorage.setItem('invocation_favs', JSON.stringify(favs));
         renderFavs();
+        showToast("Removed from Favourites");
     };
 
     const copyVerse = () => {
-        const el = document.createElement('textarea');
-        el.value = state.currentVerse;
-        document.body.appendChild(el);
-        el.select();
+        const textarea = document.createElement('textarea');
+        textarea.value = state.currentVerse;
+        document.body.appendChild(textarea);
+        textarea.select();
         document.execCommand('copy');
-        document.body.removeChild(el);
-        showToast("Copied to Clipboard 📋");
+        showToast("Copied to Clipboard");
+        document.body.removeChild(textarea);
     };
 
     const snap = () => {
+        haptic();
         const loader = document.getElementById('loader');
         loader.style.display = 'flex';
-        loader.style.opacity = '0.7';
+        loader.style.opacity = '0.8';
         
         html2canvas(document.getElementById('shareArea'), { 
             backgroundColor: null, 
-            scale: 2,
+            scale: 2.5, 
+            logging: false, 
             useCORS: true 
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = `Invocation-${Date.now()}.png`;
-            link.href = canvas.toDataURL();
+            link.href = canvas.toDataURL("image/png");
             link.click();
             loader.style.display = 'none';
-            showToast("Image Saved 📸");
-        }).catch(err => {
-            loader.style.display = 'none';
-            showToast("Capture Failed");
+            showToast("Saved to Photos");
         });
     };
 
     const setTheme = (t) => {
         document.body.className = t;
-        document.getElementById('settingsPanel').classList.remove('active');
+        showToast(`Theme: ${t.charAt(0).toUpperCase() + t.slice(1)}`);
     };
 
     window.onload = () => {
+        // Mood Carousel Setup
+        const grid = document.getElementById('moodGrid');
+        let moodHtml = '<div style="flex:0 0 10vw;"></div>';
+        moodCards.forEach(m => {
+            moodHtml += `
+                <div class="mood-card" onclick="openState('${m.id}')">
+                    <h3>${m.title}</h3>
+                    <p>${m.desc}</p>
+                </div>
+            `;
+        });
+        moodHtml += '<div style="flex:0 0 10vw;"></div>';
+        grid.innerHTML = moodHtml;
+
+        // Protection List (Restored with Emojis)
         document.getElementById('protectList').innerHTML = protectionLibrary.map(p => `
             <div class="list-item" onclick="openState('${p.id}')">
-                <div style="font-weight:600; font-size:12px; color:var(--accent); margin-bottom:4px;">${p.name.toUpperCase()}</div>
-                <div style="font-size:11px; opacity:0.6;">${p.desc}</div>
+                <div style="font-size: 24px; margin-bottom: 10px;">${p.icon}</div>
+                <h4>${p.name.toUpperCase()}</h4>
+                <p>${p.desc}</p>
             </div>
         `).join('');
 
-        const l = document.getElementById('loader');
-        l.style.opacity = '0';
-        setTimeout(() => l.style.display = 'none', 500);
-    };
+        // Welcome Screen Trigger
+        document.getElementById('welcomeScreen').addEventListener('click', () => navigate('moodScreen'));
 
-    document.addEventListener('click', (e) => {
-        const p = document.getElementById('settingsPanel');
-        if (p.classList.contains('active') && !p.contains(e.target) && !e.target.closest('.settings-btn')) {
-            p.classList.remove('active');
-        }
-    });
+        // Header Triggers
+        document.getElementById('triggerSettings').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('settingsPanel').classList.toggle('active');
+        });
+
+        // Close settings when tapping outside
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('settingsPanel');
+            if (panel.classList.contains('active') && !panel.contains(e.target)) {
+                panel.classList.remove('active');
+            }
+        });
+
+        // Fix mobile height
+        const vh = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+        window.addEventListener('resize', vh);
+        vh();
+
+        // Reveal App
+        setTimeout(() => {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 600);
+        }, 1000);
+    };
 </script>
 </body>
 </html>
