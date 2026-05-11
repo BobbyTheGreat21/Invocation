@@ -1,0 +1,42 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+
+// Auth functions
+export const loginAnonymously = async () => {
+  try {
+    const userCredential = await signInAnonymously(auth);
+    return userCredential.user;
+  } catch (error) {
+    return console.error(error.message), null;
+  }
+};
+
+export const onAuthChange = (cb) => onAuthStateChanged(auth, cb);
+
+// Data functions
+export const syncFavorites = async (userId, content) => {
+  try {
+    await addDoc(collection(db, 'favorites'), {
+      userId,
+      content,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error("Sync error:", error);
+    throw error;
+  }
+};
