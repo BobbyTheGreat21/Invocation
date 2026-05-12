@@ -402,6 +402,7 @@
 
     const openMood = (id) => {
         state.currentMood = id;
+        state.currentVerse = ''; // Reset to ensure snappy entry animation on every category click
         nextVerse();
         navigate('verseScreen');
     };
@@ -512,7 +513,10 @@
         haptic();
         const el = document.createElement('textarea');
         el.value = state.currentVerse;
-        document.body.appendChild(el); el.select();
+        el.style.position = 'absolute';
+        el.style.left = '-9999px'; // Prevent jumping on mobile devices
+        document.body.appendChild(el); 
+        el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
         showToast("Copied");
@@ -526,7 +530,9 @@
             const a = document.createElement('a');
             a.download = 'Daily_Invocation.png'; 
             a.href = canvas.toDataURL(); 
+            document.body.appendChild(a); // Appending element fixes download block on some iOS/Android browsers
             a.click();
+            document.body.removeChild(a);
             l.style.display = 'none';
         });
     };
